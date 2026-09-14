@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07172f" />
+  <title>RK CELL — Tracking Service</title>
+  <meta name="description" content="Tracking service RK CELL — Cepat, Akurat, Transparan. Pantau status, QC, garansi, dan progres perbaikan perangkat Anda." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <style>
+    :root{
+      --bg:#06111f;
+      --bg2:#0a1b31;
+      --card:#0d223b;
+      --card2:#102b49;
+      --line:rgba(255,255,255,.10);
+      --text:#f7fbff;
+      --muted:#9fb4c9;
+      --accent:#27b6ff;
+      --accent2:#ff9a2f;
+      --success:#22c55e;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 10% -10%,rgba(39,182,255,.16),transparent 32%),
+        radial-gradient(circle at 100% 8%,rgba(255,154,47,.12),transparent 26%),
+        linear-gradient(180deg,var(--bg),#081626 58%,#07111d);
+      color:var(--text);
+      min-height:100vh;
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{width:min(1120px,calc(100% - 28px));margin:auto}
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      background:rgba(6,17,31,.82);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar .inner{
+      min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+    }
+    .brand{display:flex;align-items:center;gap:11px;min-width:0}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      display:grid;place-items:center;font-weight:900;letter-spacing:-1px;
+      background:linear-gradient(145deg,var(--accent),#1565d8 60%,var(--accent2));
+      box-shadow:0 8px 24px rgba(39,182,255,.25);
+      flex:none;
+    }
+    .brand strong{font-size:16px;display:block;line-height:1.05}
+    .brand span{display:block;color:var(--muted);font-size:11px;margin-top:4px;letter-spacing:.4px}
+    .top-actions{display:flex;gap:8px}
+    .mini-btn{
+      border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);
+      padding:9px 12px;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer
+    }
+
+    .hero{
+      padding:40px 0 22px;
+      display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:stretch
+    }
+    .hero-main,.hero-side,.card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(16,43,73,.86),rgba(10,29,50,.92));
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+    }
+    .hero-main{padding:32px;position:relative;overflow:hidden}
+    .hero-main:after{
+      content:"";position:absolute;width:220px;height:220px;border-radius:50%;
+      right:-70px;top:-80px;background:radial-gradient(circle,rgba(39,182,255,.24),transparent 67%);
+      pointer-events:none
+    }
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      color:#bfeaff;background:rgba(39,182,255,.10);
+      border:1px solid rgba(39,182,255,.22);
+      padding:7px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.8px
+    }
+    .hero h1{font-size:clamp(34px,6vw,62px);line-height:.98;margin:18px 0 13px;letter-spacing:-2.5px}
+    .hero h1 .rk{color:var(--accent)}
+    .hero h1 .sell{color:var(--accent2)}
+    .hero p{margin:0;color:var(--muted);font-size:15px;line-height:1.75;max-width:720px}
+    .hero-values{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .value-chip{
+      padding:9px 12px;border-radius:14px;background:rgba(255,255,255,.045);
+      border:1px solid var(--line);font-size:12px;font-weight:800;color:#dff5ff
+    }
+    .hero-side{padding:22px;display:flex;flex-direction:column;justify-content:space-between}
+    .trust-title{font-size:13px;font-weight:900;color:#dcecff;margin-bottom:12px}
+    .trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .trust-item{
+      padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)
+    }
+    .trust-item b{display:block;font-size:19px;margin-bottom:3px}
+    .trust-item span{font-size:11px;color:var(--muted);line-height:1.45}
+    .cta{
+      margin-top:16px;display:flex;gap:10px;flex-wrap:wrap
+    }
+    .btn{
+      border:0;cursor:pointer;font-weight:900;border-radius:14px;padding:12px 15px;font-size:13px
+    }
+    .btn-primary{background:linear-gradient(135deg,var(--accent),#147ce5);color:white}
+    .btn-secondary{background:rgba(255,255,255,.06);color:white;border:1px solid var(--line)}
+    .btn-wa{background:#1ecf6b;color:#042512}
+
+    .lookup{padding:18px;margin:8px 0 22px}
+    .lookup-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .lookup-title strong{font-size:14px}
+    .lookup-title span{font-size:11px;color:var(--muted)}
+    .lookup-row{display:flex;gap:10px}
+    .input{
+      flex:1;min-width:0;border:1px solid var(--line);background:#07182a;color:white;
+      border-radius:14px;padding:14px 15px;font-size:14px;outline:none
+    }
+    .input:focus{border-color:rgba(39,182,255,.55);box-shadow:0 0 0 3px rgba(39,182,255,.09)}
+    .status-msg{font-size:12px;color:var(--muted);margin-top:10px;min-height:18px}
+
+    .service-shell{display:none;gap:18px;padding-bottom:42px}
+    .service-shell.active{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(290px,.8fr)}
+    .stack{display:grid;gap:18px}
+    .card{padding:20px}
+    .card h2,.card h3{margin:0}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .section-head h2{font-size:18px}
+    .section-head p{margin:3px 0 0;color:var(--muted);font-size:11px}
+    .badge{
+      display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:999px;
+      font-size:11px;font-weight:900;border:1px solid var(--line)
+    }
+    .status-waiting{background:rgba(245,158,11,.10);color:#ffd481;border-color:rgba(245,158,11,.25)}
+    .status-progress{background:rgba(39,182,255,.10);color:#bfeaff;border-color:rgba(39,182,255,.25)}
+    .status-done{background:rgba(34,197,94,.11);color:#aaf3bf;border-color:rgba(34,197,94,.24)}
+    .status-bad{background:rgba(239,68,68,.10);color:#ffb0b0;border-color:rgba(239,68,68,.24)}
+
+    .summary{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px
+    }
+    .info{
+      padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)
+    }
+    .info .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+    .info .v{font-size:14px;font-weight:850;margin-top:6px;word-break:break-word}
+    .info.full{grid-column:1/-1}
+
+    .progress{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+    .step{text-align:center;position:relative}
+    .dot{
+      width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin:0 auto 7px;
+      border:1px solid var(--line);background:#0a1d31;color:#7290ab;font-size:10px;font-weight:900
+    }
+    .step.active .dot{background:linear-gradient(135deg,var(--accent),#1877d5);color:white;border-color:transparent}
+    .step.done .dot{background:var(--success);color:white;border-color:transparent}
+    .step small{font-size:9px;color:var(--muted);line-height:1.25;display:block}
+    .step.done small,.step.active small{color:#e9f8ff;font-weight:800}
+
+    .qc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .qc-card{padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+    .qc-card h4{margin:0 0 10px;font-size:13px}
+    .qc-list{display:grid;gap:7px}
+    .qc-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;padding-bottom:7px;border-bottom:1px dashed rgba(255,255,255,.08)}
+    .qc-row:last-child{border-bottom:0;padding-bottom:0}
+    .qc-row span:first-child{color:#c9d8e7}
+    .qc-ok{color:#98f3b3;font-weight:800}
+    .qc-problem{color:#ffb9b9;font-weight:800}
+    .qc-neutral{color:#a9bed1;font-weight:800}
+
+    .warranty-box{
+      padding:18px;border-radius:18px;background:
+      linear-gradient(145deg,rgba(255,154,47,.12),rgba(39,182,255,.08));
+      border:1px solid rgba(255,154,47,.22)
+    }
+    .warranty-big{font-size:28px;font-weight:950;letter-spacing:-1px;margin:4px 0}
+    .muted{color:var(--muted)}
+    .small{font-size:11px}
+    .promo-grid{display:grid;gap:10px}
+    .promo{
+      border:1px solid rgba(255,154,47,.22);background:rgba(255,154,47,.06);
+      border-radius:16px;padding:14px
+    }
+    .promo strong{display:block;color:#ffd7a0;margin-bottom:4px}
+    .promo p{margin:0;color:#d5c0a6;font-size:11px;line-height:1.5}
+
+    .sell-card{
+      background:
+        radial-gradient(circle at 100% 0%,rgba(39,182,255,.16),transparent 32%),
+        linear-gradient(180deg,#102b49,#0c2036)
+    }
+    .sell-card .lead{font-size:20px;font-weight:950;line-height:1.16;letter-spacing:-.5px}
+    .sell-card .lead span{color:var(--accent2)}
+    .sell-points{display:grid;gap:10px;margin-top:15px}
+    .sell-point{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#d7e6f3}
+    .sell-icon{
+      flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;
+      background:rgba(39,182,255,.10);border:1px solid rgba(39,182,255,.16)
+    }
+
+    .rating{display:flex;gap:7px;margin:10px 0 12px}
+    .star{
+      font-size:25px;background:none;border:0;color:#50677e;padding:0;cursor:pointer
+    }
+    .star.active{color:#ffc857}
+    textarea{
+      width:100%;min-height:96px;resize:vertical;background:#07182a;color:white;border:1px solid var(--line);
+      border-radius:14px;padding:12px;font:inherit;font-size:12px;outline:none
+    }
+
+    .empty{
+      padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px
+    }
+    footer{
+      padding:22px 0 36px;color:#6f879e;font-size:11px;text-align:center
+    }
+
+    @media(max-width:860px){
+      .hero{grid-template-columns:1fr;padding-top:24px}
+      .service-shell.active{grid-template-columns:1fr}
+      .hero-main{padding:24px}
+      .hero h1{font-size:42px}
+    }
+    @media(max-width:560px){
+      .wrap{width:min(100% - 20px,1120px)}
+      .topbar .inner{min-height:60px}
+      .brand span{display:none}
+      .hero{gap:14px}
+      .hero-main,.hero-side,.card{border-radius:18px}
+      .hero-main{padding:20px}
+      .hero-side{padding:16px}
+      .hero h1{font-size:36px;letter-spacing:-1.8px}
+      .hero p{font-size:13px}
+      .trust-grid{grid-template-columns:1fr 1fr}
+      .lookup-row{flex-direction:column}
+      .summary{grid-template-columns:1fr}
+      .info.full{grid-column:auto}
+      .progress{gap:3px}
+      .dot{width:24px;height:24px;font-size:9px}
+      .step small{font-size:8px}
+      .qc-grid{grid-template-columns:1fr}
+      .top-actions .mini-btn:first-child{display:none}
+    }
+
+    /* === RK CELL TRACKING FOCUS PATCH === */
+    #serviceShell .info .v,
+    #serviceShell .info .k,
+    #serviceShell .section-head h2,
+    #serviceShell .section-head p,
+    #serviceShell .badge,
+    #serviceShell .qc-card,
+    #serviceShell .warranty-box,
+    #serviceShell .date-card,
+    #serviceShell .parts-box {
+      text-transform: uppercase;
+    }
+
+    .warranty-box{
+      padding:22px;
+      border-radius:20px;
+      background:
+        radial-gradient(circle at 100% 0%,rgba(239,68,68,.20),transparent 34%),
+        linear-gradient(145deg,rgba(239,68,68,.10),rgba(10,29,50,.96));
+      border:1px solid rgba(239,68,68,.42);
+      box-shadow:0 16px 38px rgba(239,68,68,.10);
+    }
+    .warranty-big{
+      font-size:clamp(42px,8vw,68px);
+      line-height:.95;
+      font-weight:1000;
+      letter-spacing:-2px;
+      margin:8px 0 10px;
+      color:#ff3b45;
+      text-transform:uppercase;
+    }
+    .warranty-state{
+      display:inline-flex;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(239,68,68,.12);
+      border:1px solid rgba(239,68,68,.24);
+      color:#ffadb2;
+      font-size:10px;
+      font-weight:950;
+      margin-bottom:10px;
+    }
+    .warranty-dates{
+      font-size:11px;
+      line-height:1.75;
+      color:#d9e4ee;
+    }
+
+    .date-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .date-card{
+      padding:13px;
+      border-radius:15px;
+      background:rgba(255,255,255,.035);
+      border:1px solid var(--line);
+    }
+    .date-card .date-label{
+      font-size:10px;
+      color:var(--muted);
+      letter-spacing:.65px;
+    }
+    .date-card .date-value{
+      margin-top:6px;
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .parts-box{
+      padding:14px;
+      border-radius:16px;
+      background:rgba(255,154,47,.06);
+      border:1px solid rgba(255,154,47,.20);
+    }
+    .parts-list{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .part-chip{
+      padding:8px 10px;
+      border-radius:11px;
+      background:rgba(255,255,255,.055);
+      border:1px solid var(--line);
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .qc-card{
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .qc-card:hover{border-color:rgba(39,182,255,.30)}
+    .qc-summary-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .qc-state{
+      padding:6px 9px;
+      border-radius:999px;
+      font-size:9px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+    .qc-state.ok{
+      background:rgba(34,197,94,.12);
+      color:#aaf3bf;
+      border:1px solid rgba(34,197,94,.20);
+    }
+    .qc-state.problem{
+      background:rgba(239,68,68,.12);
+      color:#ffb0b0;
+      border:1px solid rgba(239,68,68,.24);
+    }
+    .qc-state.empty{
+      background:rgba(255,255,255,.06);
+      color:#a9bed1;
+      border:1px solid var(--line);
+    }
+    .qc-hint{
+      margin-top:7px;
+      font-size:10px;
+      color:var(--muted);
+    }
+    .qc-details{
+      display:none;
+      margin-top:11px;
+      padding-top:10px;
+      border-top:1px dashed rgba(255,255,255,.10);
+    }
+    .qc-card.open .qc-details{display:grid;gap:7px}
+
+    @media(max-width:560px){
+      .date-grid{grid-template-columns:1fr}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap inner">
+      <div class="brand">
+        <div class="logo">RK</div>
+        <div>
+          <strong>RK CELL SERVICE</strong>
+          <span>CEPAT • AKURAT • TRANSPARAN</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="mini-btn" onclick="document.getElementById('tracking').scrollIntoView()">Tracking</button>
+        <button class="mini-btn" onclick="openWA()">WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-main">
+        <div class="eyebrow">● TRACKING SERVICE DIGITAL</div>
+        <h1>Service HP <span class="rk">lebih jelas.</span><br><span class="sell">Lebih terpercaya.</span></h1>
+        <p>
+          Di RK CELL, pelanggan tidak hanya menitipkan perangkat. Anda bisa memantau progres,
+          melihat pemeriksaan sebelum dan sesudah service, serta mengetahui garansi dengan lebih transparan.
+        </p>
+        <div class="hero-values">
+          <div class="value-chip">✓ Status Service</div>
+          <div class="value-chip">✓ QC Sebelum & Sesudah</div>
+          <div class="value-chip">✓ Garansi Jelas</div>
+          <div class="value-chip">✓ Riwayat Perbaikan</div>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div>
+          <div class="trust-title">KENAPA SERVICE DI RK CELL?</div>
+          <div class="trust-grid">
+            <div class="trust-item"><b>01</b><span>Pemeriksaan perangkat lebih terstruktur</span></div>
+            <div class="trust-item"><b>02</b><span>Progress dapat dipantau lewat invoice</span></div>
+            <div class="trust-item"><b>03</b><span>QC akhir sebelum perangkat diserahkan</span></div>
+            <div class="trust-item"><b>04</b><span>Garansi tercatat dan mudah dicek kembali</span></div>
+          </div>
+        </div>
+        <div class="cta">
+          <button class="btn btn-primary" onclick="document.getElementById('tracking').scrollIntoView()">Cek Service Saya</button>
+          <button class="btn btn-wa" onclick="openWA()">Konsultasi WhatsApp</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card lookup" id="tracking">
+      <div class="lookup-title">
+        <div>
+          <strong>TRACKING SERVICE</strong>
+          <div class="small muted">Masukkan nomor invoice / tiket service</div>
+        </div>
+        <span>RK CELL DIGITAL SERVICE</span>
+      </div>
+      <div class="lookup-row">
+        <input id="ticketInput" class="input" placeholder="Contoh: SRV-20260914-0001" autocomplete="off" />
+        <button class="btn btn-primary" onclick="loadTracking()">CEK TRACKING</button>
+      </div>
+      <div id="statusMsg" class="status-msg"></div>
+    </section>
+
+    <section id="serviceShell" class="service-shell">
+      <div class="stack">
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>DETAIL SERVICE</h2>
+              <p>INFORMASI UTAMA PERANGKAT DAN PROGRES PERBAIKAN</p>
+            </div>
+            <div id="statusBadge" class="badge status-progress">MEMUAT</div>
+          </div>
+          <div id="summaryGrid" class="summary"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Tanggal Service</h2>
+              <p>Tanggal masuk, selesai, diambil, dan masa garansi</p>
+            </div>
+          </div>
+          <div id="dateGrid" class="date-grid"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Komponen yang Diganti</h2>
+              <p>Part / komponen yang tercatat pada service</p>
+            </div>
+          </div>
+          <div id="partsBox" class="parts-box"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>PROGRESS SERVICE</h2>
+              <p>Perjalanan perangkat Anda di RK CELL</p>
+            </div>
+          </div>
+          <div id="progressBar" class="progress"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>QUALITY CONTROL</h2>
+              <p>Pemeriksaan sebelum dan sesudah pengerjaan</p>
+            </div>
+          </div>
+          <div class="qc-grid">
+            <div id="qcInitialCard" class="qc-card" onclick="toggleQc('qcInitialCard')"></div>
+            <div id="qcFinalCard" class="qc-card" onclick="toggleQc('qcFinalCard')"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Testimoni Pelanggan</h2>
+              <p>Bantu RK CELL terus meningkatkan pelayanan</p>
+            </div>
+          </div>
+          <div id="testimonialSaved" class="small muted" style="margin-bottom:10px"></div>
+          <div class="rating" id="ratingStars">
+            <button class="star" data-v="1">★</button>
+            <button class="star" data-v="2">★</button>
+            <button class="star" data-v="3">★</button>
+            <button class="star" data-v="4">★</button>
+            <button class="star" data-v="5">★</button>
+          </div>
+          <textarea id="testimonialText" maxlength="500" placeholder="Ceritakan pengalaman service Anda di RK CELL..."></textarea>
+          <div class="cta">
+            <button class="btn btn-primary" onclick="submitTestimonial()">Kirim Testimoni</button>
+          </div>
+          <div id="testimonialMsg" class="status-msg"></div>
+        </section>
+      </div>
+
+      <aside class="stack">
+        <section class="card sell-card">
+          <div class="eyebrow">NILAI LAYANAN RK CELL</div>
+          <div class="lead" style="margin-top:13px">Bukan sekadar <span>memperbaiki HP.</span><br>Kami membuat prosesnya lebih jelas.</div>
+          <div class="sell-points">
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Transparan</b><br><span class="muted">Status dan tahapan service dapat dipantau.</span></div></div>
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Terukur</b><br><span class="muted">QC membantu membandingkan kondisi sebelum dan sesudah.</span></div></div>
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Lebih Aman</b><br><span class="muted">Garansi dan histori service tersimpan berdasarkan invoice.</span></div></div>
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Lebih Mudah</b><br><span class="muted">Satu QR untuk memantau perkembangan service.</span></div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div><h2>GARANSI SERVICE</h2><p>Informasi garansi sesuai pekerjaan</p></div>
+          </div>
+          <div id="warrantyBox" class="warranty-box">
+            <div class="small muted">GARANSI</div>
+            <div class="warranty-big">—</div>
+            <div class="small muted">Menunggu data service.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div><h2>Promo Aktif</h2><p>Program yang sedang tersedia di RK CELL</p></div>
+          </div>
+          <div id="promoGrid" class="promo-grid">
+            <div class="empty">Memuat promo...</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div><h2>Butuh Bantuan?</h2><p>Hubungi admin RK CELL</p></div>
+          </div>
+          <div class="cta">
+            <button class="btn btn-wa" style="width:100%" onclick="openWA()">Chat WhatsApp RK CELL</button>
+          </div>
+          <div class="small muted" style="margin-top:12px;line-height:1.6">
+            Jalan Veteran, Belakang POS Curup<br>
+            Melayani Sepenuh Hati
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <footer>
+      RK CELL SERVICE • Cepat • Akurat • Transparan<br>
+      Sistem tracking digital untuk pengalaman service yang lebih jelas.
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://qobrmwqrawkixdjevcji.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_axRHboFphJ8FqG5mH4DY-g_UeXFKNhf';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const WA_NUMBER = '6285148495045';
+    let currentTicket = '';
+    let currentOrder = null;
+    let selectedRating = 0;
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    const fmtDate = v => {
+      if(!v) return '—';
+      const d = new Date(v);
+      if(Number.isNaN(d.getTime())) return '—';
+      return new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(d);
+    };
+    const fmtDateOnly = v => {
+      if(!v) return '—';
+      const d = new Date(v);
+      if(Number.isNaN(d.getTime())) return '—';
+      return new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
+    };
+    const maskImei = imei => {
+      const s = String(imei || '').trim();
+      if(!s) return '—';
+      if(s.length <= 8) return s;
+      return s.slice(0,4) + '•••••••' + s.slice(-4);
+    };
+    const normStatus = s => String(s||'').toLowerCase().trim();
+    const upperText = s => String(s ?? '—').toUpperCase();
+
+    function toggleQc(id){
+      const el = $(id);
+      if(el) el.classList.toggle('open');
+    }
+
+    function openWA(){
+      const text = currentTicket
+        ? `Halo RK CELL, saya ingin menanyakan service ${currentTicket}.`
+        : 'Halo RK CELL, saya ingin konsultasi service.';
+      location.href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+    }
+
+    function statusInfo(status){
+      const s = normStatus(status);
+      if(['completed','selesai'].includes(s)) return ['SELESAI','status-done'];
+      if(['picked_up','diambil','picked'].includes(s)) return ['SUDAH DIAMBIL','status-done'];
+      if(['cancel','cancelled','dibatalkan','tidak_bisa_diperbaiki'].includes(s)) return ['DITUTUP','status-bad'];
+      if(['waiting','masuk','pending','awaiting_confirmation'].includes(s)) return ['MENUNGGU','status-waiting'];
+      if(['diagnosis','diagnosa','in_progress','proses','quality','quality_control'].includes(s)) return ['DIPROSES','status-progress'];
+      return [String(status||'PROSES').toUpperCase(),'status-progress'];
+    }
+
+    function progressIndex(status){
+      const s = normStatus(status);
+      if(['waiting','masuk'].includes(s)) return 0;
+      if(['diagnosis','diagnosa'].includes(s)) return 1;
+      if(['awaiting_confirmation','konfirmasi'].includes(s)) return 2;
+      if(['in_progress','proses','pending'].includes(s)) return 3;
+      if(['quality','quality_control','qc'].includes(s)) return 4;
+      if(['completed','selesai','picked_up','diambil','picked'].includes(s)) return 5;
+      return 0;
+    }
+
+    function renderProgress(status){
+      const labels = ['Masuk','Diagnosa','Konfirmasi','Proses','QC','Selesai'];
+      const idx = progressIndex(status);
+      $('progressBar').innerHTML = labels.map((x,i)=>{
+        const cls = i < idx ? 'step done' : (i===idx ? 'step active' : 'step');
+        return `<div class="${cls}"><div class="dot">${i < idx ? '✓' : i+1}</div><small>${x}</small></div>`;
+      }).join('');
+    }
+
+    function flattenQc(data){
+      if(!data) return [];
+      let src = data;
+      if(typeof src === 'string'){
+        try{ src = JSON.parse(src); }catch{ return []; }
+      }
+      if(Array.isArray(src)){
+        return src.map((x,i)=>{
+          if(typeof x === 'string') return {name:x,status:'NORMAL'};
+          return {
+            name:x.name || x.label || x.item || x.title || `Item ${i+1}`,
+            status:x.status || x.result || x.value || x.state || ''
+          };
+        });
+      }
+      if(src.items && Array.isArray(src.items)) return flattenQc(src.items);
+      if(src.qc && typeof src.qc === 'object') return flattenQc(src.qc);
+      if(typeof src === 'object'){
+        return Object.entries(src).map(([k,v])=>{
+          if(v && typeof v==='object') return {name:v.name||v.label||k,status:v.status||v.result||v.value||''};
+          return {name:k,status:String(v ?? '')};
+        });
+      }
+      return [];
+    }
+
+    function qcClass(status){
+      const s = String(status||'').toUpperCase();
+      if(['NORMAL','OK','PASS','BAIK','GOOD','BERFUNGSI'].some(x=>s.includes(x))) return 'qc-ok';
+      if(['PROBLEM','RUSAK','FAIL','ERROR','BERMASALAH'].some(x=>s.includes(x))) return 'qc-problem';
+      return 'qc-neutral';
+    }
+
+    function qcHasProblem(status){
+      const s = String(status||'').toUpperCase();
+      return ['PROBLEM','RUSAK','FAIL','ERROR','BERMASALAH','NG','TIDAK NORMAL']
+        .some(x=>s.includes(x));
+    }
+
+    function renderQcCard(target,title,data){
+      const rows = flattenQc(data);
+      const problems = rows.filter(x=>qcHasProblem(x.status));
+
+      let badgeClass = 'empty';
+      let badgeText = 'BELUM ADA DATA';
+      let hint = 'KLIK UNTUK MELIHAT DETAIL';
+
+      if(rows.length){
+        if(problems.length){
+          badgeClass = 'problem';
+          badgeText = `ADA ${problems.length} MASALAH`;
+          hint = 'PERLU PERHATIAN • KLIK UNTUK DETAIL';
+        }else{
+          badgeClass = 'ok';
+          badgeText = 'TIDAK ADA MASALAH';
+          hint = 'HASIL QC NORMAL • KLIK UNTUK DETAIL';
+        }
+      }
+
+      const details = rows.length
+        ? rows.slice(0,60).map(x=>`
+            <div class="qc-row">
+              <span>${esc(upperText(x.name))}</span>
+              <span class="${qcClass(x.status)}">${esc(upperText(x.status || '—'))}</span>
+            </div>`).join('')
+        : '<div class="small muted">BELUM ADA DATA QC.</div>';
+
+      $(target).innerHTML = `
+        <div class="qc-summary-head">
+          <h4 style="margin:0">${title}</h4>
+          <span class="qc-state ${badgeClass}">${badgeText}</span>
+        </div>
+        <div class="qc-hint">${hint}</div>
+        <div class="qc-details">${details}</div>`;
+    }
+
+    function renderWarranty(o){
+      const base = Number(o.warranty_days || 0);
+      const extra = Number(o.promo_warranty_extra_days || 0);
+      const total = Math.max(0, base + extra);
+      const startRaw = o.picked_up_at || o.final_receipt_printed_at || null;
+      const box = $('warrantyBox');
+
+      if(total <= 0){
+        box.innerHTML = `
+          <div class="small muted">GARANSI SERVICE</div>
+          <div class="warranty-big">TANPA GARANSI</div>
+          <div class="warranty-state">TIDAK ADA MASA GARANSI</div>
+          <div class="warranty-dates">${esc(upperText(o.warranty_terms || 'MENGIKUTI KETENTUAN SERVICE YANG DILAKUKAN.'))}</div>`;
+        return;
+      }
+
+      if(!startRaw){
+        box.innerHTML = `
+          <div class="small muted">GARANSI SERVICE</div>
+          <div class="warranty-big">${total} HARI</div>
+          <div class="warranty-state">BELUM DIMULAI</div>
+          <div class="warranty-dates">
+            GARANSI MULAI DIHITUNG SAAT PERANGKAT DIAMBIL / DISERAHKAN.
+            ${extra>0?`<br>BONUS PROMO: +${extra} HARI`:''}
+          </div>`;
+        return;
+      }
+
+      const start = new Date(startRaw);
+      const end = new Date(start);
+      end.setDate(end.getDate()+total);
+      const active = new Date() <= end;
+
+      box.innerHTML = `
+        <div class="small muted">GARANSI SERVICE</div>
+        <div class="warranty-big">${total} HARI</div>
+        <div class="warranty-state">${active?'GARANSI AKTIF':'GARANSI SELESAI'}</div>
+        <div class="warranty-dates">
+          TANGGAL GARANSI: ${fmtDateOnly(start)}<br>
+          BERAKHIR: ${fmtDateOnly(end)}
+          ${extra>0?`<br>BONUS PROMO: +${extra} HARI`:''}
+        </div>`;
+    }
+
+    function renderSummary(o){
+      const customer = o.members?.name || o.customer_name || o.member_name || '—';
+      const device = [o.device_brand,o.device_model].filter(Boolean).join(' ') || o.device_type || '—';
+      $('summaryGrid').innerHTML = `
+        <div class="info"><div class="k">NO. INVOICE</div><div class="v">${esc(upperText(o.ticket_number))}</div></div>
+        <div class="info"><div class="k">PELANGGAN</div><div class="v">${esc(upperText(customer))}</div></div>
+        <div class="info"><div class="k">PERANGKAT</div><div class="v">${esc(upperText(device))}</div></div>
+        <div class="info"><div class="k">IMEI / SERIAL</div><div class="v">${esc(upperText(maskImei(o.imei || o.imei1 || o.serial_number)))}</div></div>
+        <div class="info full"><div class="k">KELUHAN / KERUSAKAN</div><div class="v">${esc(upperText(o.complaint || '—'))}</div></div>
+        <div class="info full"><div class="k">TINDAKAN / HASIL SERVICE</div><div class="v">${esc(upperText(o.repair_summary || o.repair_action || 'BELUM ADA RINGKASAN TINDAKAN.'))}</div></div>
+      `;
+    }
+
+    function renderDates(o){
+      const completed = o.final_completed_at || o.completed_at || null;
+      const picked = o.picked_up_at || o.final_receipt_printed_at || null;
+      const totalWarranty = Math.max(0, Number(o.warranty_days||0) + Number(o.promo_warranty_extra_days||0));
+      let warrantyEnd = null;
+      if(picked && totalWarranty > 0){
+        warrantyEnd = new Date(picked);
+        warrantyEnd.setDate(warrantyEnd.getDate()+totalWarranty);
+      }
+
+      $('dateGrid').innerHTML = `
+        <div class="date-card"><div class="date-label">TANGGAL MASUK</div><div class="date-value">${fmtDate(o.created_at)}</div></div>
+        <div class="date-card"><div class="date-label">TANGGAL SELESAI</div><div class="date-value">${fmtDate(completed)}</div></div>
+        <div class="date-card"><div class="date-label">TANGGAL DIAMBIL</div><div class="date-value">${fmtDate(picked)}</div></div>
+        <div class="date-card"><div class="date-label">TANGGAL GARANSI</div><div class="date-value">${
+          picked && totalWarranty > 0
+            ? `${fmtDateOnly(picked)} — ${fmtDateOnly(warrantyEnd)}`
+            : '—'
+        }</div></div>
+      `;
+    }
+
+    function extractParts(o){
+      const raw =
+        o.replaced_components ??
+        o.components_replaced ??
+        o.parts_replaced ??
+        o.replaced_parts ??
+        o.parts_used ??
+        o.repair_components ??
+        o.changed_parts ??
+        o.components ??
+        null;
+
+      if(!raw) return [];
+      if(Array.isArray(raw)){
+        return raw.map(x=>{
+          if(typeof x === 'string') return x;
+          if(x && typeof x === 'object') return x.name || x.part || x.component || x.label || '';
+          return '';
+        }).filter(Boolean);
+      }
+      if(typeof raw === 'object'){
+        return Object.entries(raw)
+          .filter(([_,v])=>v !== false && v !== null && v !== '')
+          .map(([k,v])=>{
+            if(typeof v === 'string' && v !== 'true') return `${k}: ${v}`;
+            return k;
+          });
+      }
+      return String(raw).split(/[,;\n|]+/).map(s=>s.trim()).filter(Boolean);
+    }
+
+    function renderParts(o){
+      const parts = extractParts(o);
+      $('partsBox').innerHTML = parts.length
+        ? `<div class="parts-list">${parts.map(p=>`<span class="part-chip">${esc(upperText(p))}</span>`).join('')}</div>`
+        : '<div class="small muted">BELUM ADA KOMPONEN YANG DICATAT SEBAGAI DIGANTI.</div>';
+    }
+
+    async function fetchTracking(ticket){
+      // Gunakan * agar field komponen baru dari aplikasi otomatis ikut terbaca.
+      // Relasi members dicoba terlebih dahulu, lalu fallback tanpa relasi.
+      let r = await sb.from('service_orders')
+        .select('*,members(name)')
+        .eq('ticket_number',ticket)
+        .maybeSingle();
+
+      if(r.error){
+        r = await sb.from('service_orders')
+          .select('*')
+          .eq('ticket_number',ticket)
+          .maybeSingle();
+      }
+      return r;
+    }
+
+    async function loadTracking(){
+      const ticket = $('ticketInput').value.trim().toUpperCase();
+      if(!ticket){
+        $('statusMsg').textContent = 'Masukkan nomor invoice terlebih dahulu.';
+        return;
+      }
+      currentTicket = ticket;
+      $('statusMsg').textContent = 'Mengambil data service...';
+      $('serviceShell').classList.remove('active');
+
+      const {data,error} = await fetchTracking(ticket);
+      if(error){
+        console.error(error);
+        $('statusMsg').textContent = 'Data tracking belum dapat diambil. Hubungi admin RK CELL jika masalah berlanjut.';
+        return;
+      }
+      if(!data){
+        $('statusMsg').textContent = 'Nomor invoice tidak ditemukan.';
+        return;
+      }
+
+      currentOrder = data;
+      const [label,cls] = statusInfo(data.status);
+      $('statusBadge').className = `badge ${cls}`;
+      $('statusBadge').textContent = label;
+
+      renderSummary(data);
+      renderDates(data);
+      renderParts(data);
+      renderProgress(data.status);
+      renderQcCard('qcInitialCard','QC AWAL',data.initial_checklist);
+      renderQcCard('qcFinalCard','QC AKHIR',data.final_checklist);
+      renderWarranty(data);
+
+      if(data.customer_rating){
+        selectedRating = Number(data.customer_rating);
+        refreshStars();
+      }
+      if(data.customer_testimonial){
+        $('testimonialSaved').textContent = `Testimoni tersimpan: "${data.customer_testimonial}"`;
+        $('testimonialText').value = data.customer_testimonial;
+      } else {
+        $('testimonialSaved').textContent = '';
+        $('testimonialText').value = '';
+      }
+
+      $('serviceShell').classList.add('active');
+      $('statusMsg').textContent = `Tracking ditemukan • terakhir diperbarui ${fmtDate(data.updated_at || data.created_at)}`;
+      history.replaceState(null,'',`?t=${encodeURIComponent(ticket)}`);
+      setTimeout(()=>$('serviceShell').scrollIntoView({behavior:'smooth',block:'start'}),100);
+    }
+
+    function refreshStars(){
+      document.querySelectorAll('.star').forEach(s=>{
+        s.classList.toggle('active',Number(s.dataset.v)<=selectedRating);
+      });
+    }
+    document.querySelectorAll('.star').forEach(s=>{
+      s.addEventListener('click',()=>{
+        selectedRating=Number(s.dataset.v);
+        refreshStars();
+      });
+    });
+
+    async function submitTestimonial(){
+      const txt = $('testimonialText').value.trim();
+      if(!currentTicket){
+        $('testimonialMsg').textContent='Buka data service terlebih dahulu.';
+        return;
+      }
+      if(selectedRating<1 || selectedRating>5){
+        $('testimonialMsg').textContent='Pilih rating 1–5 bintang.';
+        return;
+      }
+      if(!txt){
+        $('testimonialMsg').textContent='Isi testimoni terlebih dahulu.';
+        return;
+      }
+
+      $('testimonialMsg').textContent='Mengirim testimoni...';
+      let rpc = await sb.rpc('submit_service_testimonial',{
+        p_ticket:currentTicket,
+        p_rating:selectedRating,
+        p_testimonial:txt
+      });
+
+      if(rpc.error){
+        const up = await sb.from('service_orders')
+          .update({customer_rating:selectedRating,customer_testimonial:txt})
+          .eq('ticket_number',currentTicket);
+        if(up.error){
+          console.error(rpc.error,up.error);
+          $('testimonialMsg').textContent='Testimoni belum dapat dikirim. Hubungi admin RK CELL.';
+          return;
+        }
+      }
+      $('testimonialMsg').textContent='Terima kasih. Testimoni Anda sudah tersimpan.';
+      $('testimonialSaved').textContent=`Testimoni tersimpan: "${txt}"`;
+    }
+
+    async function loadPromos(){
+      const grid = $('promoGrid');
+      let rows = [];
+
+      try{
+        const rpc = await sb.rpc('get_member_active_promos');
+        if(!rpc.error && Array.isArray(rpc.data)) rows = rpc.data;
+      }catch(e){}
+
+      if(!rows.length){
+        try{
+          const r = await sb.from('rewards').select('*').eq('active',true);
+          if(!r.error && Array.isArray(r.data)) rows = r.data;
+        }catch(e){}
+      }
+
+      if(!rows.length){
+        grid.innerHTML='<div class="empty">Belum ada promo aktif saat ini.</div>';
+        return;
+      }
+
+      const now = new Date();
+      rows = rows.filter(x=>{
+        const type = String(x.type || x.reward_type || '').toLowerCase();
+        if(type && type !== 'promo') return false;
+        if(x.active === false) return false;
+        const start = x.start_at || x.start_date;
+        const end = x.end_at || x.end_date;
+        if(start && new Date(start) > now) return false;
+        if(end){
+          const d = new Date(end);
+          if(String(end).length<=10) d.setHours(23,59,59,999);
+          if(d < now) return false;
+        }
+        return true;
+      }).slice(0,6);
+
+      if(!rows.length){
+        grid.innerHTML='<div class="empty">Belum ada promo aktif saat ini.</div>';
+        return;
+      }
+
+      grid.innerHTML=rows.map(x=>`
+        <div class="promo">
+          <strong>${esc(x.reward_name || x.name || x.title || 'Promo RK CELL')}</strong>
+          <p>${esc(x.description || x.benefit || x.promo_benefit_label || 'Hubungi admin untuk detail promo.')}</p>
+        </div>`).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      loadPromos();
+      const p = new URLSearchParams(location.search);
+      const t = (p.get('t') || '').trim();
+      if(t){
+        $('ticketInput').value=t.toUpperCase();
+        loadTracking();
+      }
+      $('ticketInput').addEventListener('keydown',e=>{
+        if(e.key==='Enter') loadTracking();
+      });
+    });
+  </script>
+</body>
+</html>
