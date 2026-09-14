@@ -1,420 +1,789 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#071426">
-  <meta name="description" content="Tracking Service RK CELL: status, QC awal/akhir, IMEI, garansi, promo aktif, dan testimoni.">
-  <title>RK CELL • Tracking Service</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect rx=%2216%22 width=%2264%22 height=%2264%22 fill=%22%232563eb%22/><text x=%2232%22 y=%2240%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2223%22 font-weight=%22900%22 fill=%22white%22>RK</text></svg>">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07172f" />
+  <title>RK CELL — Tracking Service</title>
+  <meta name="description" content="Tracking service RK CELL — Cepat, Akurat, Transparan. Pantau status, QC, garansi, dan progres perbaikan perangkat Anda." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <style>
     :root{
-      --bg:#071426;--panel:#0b1b30;--panel2:#10243d;--line:#1f3653;
-      --text:#eff6ff;--muted:#8fa8c5;--blue:#3b82f6;--cyan:#22d3ee;
-      --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#a78bfa;
-      --shadow:0 20px 55px rgba(0,0,0,.28)
+      --bg:#06111f;
+      --bg2:#0a1b31;
+      --card:#0d223b;
+      --card2:#102b49;
+      --line:rgba(255,255,255,.10);
+      --text:#f7fbff;
+      --muted:#9fb4c9;
+      --accent:#27b6ff;
+      --accent2:#ff9a2f;
+      --success:#22c55e;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:22px;
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
-      margin:0;min-height:100vh;color:var(--text);
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:
-        radial-gradient(circle at 95% -10%,rgba(37,99,235,.20),transparent 29%),
-        radial-gradient(circle at 4% 36%,rgba(34,211,238,.08),transparent 25%),
-        linear-gradient(180deg,#06111f,#071426 45%,#081525)
+        radial-gradient(circle at 10% -10%,rgba(39,182,255,.16),transparent 32%),
+        radial-gradient(circle at 100% 8%,rgba(255,154,47,.12),transparent 26%),
+        linear-gradient(180deg,var(--bg),#081626 58%,#07111d);
+      color:var(--text);
+      min-height:100vh;
     }
-    button,input,textarea{font:inherit}
-    .app{max-width:920px;margin:auto;padding:12px 14px 38px}
+    a{color:inherit;text-decoration:none}
+    .wrap{width:min(1120px,calc(100% - 28px));margin:auto}
     .topbar{
-      position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:10px 0 14px;background:linear-gradient(180deg,rgba(7,20,38,.98),rgba(7,20,38,.86),transparent);
-      backdrop-filter:blur(10px)
+      position:sticky;top:0;z-index:20;
+      background:rgba(6,17,31,.82);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
     }
-    .brand{display:flex;align-items:center;gap:10px}
+    .topbar .inner{
+      min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+    }
+    .brand{display:flex;align-items:center;gap:11px;min-width:0}
     .logo{
-      width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
-      background:linear-gradient(135deg,#2563eb,#06b6d4);font-weight:1000;letter-spacing:-1px;
-      box-shadow:0 10px 28px rgba(37,99,235,.32);border:1px solid rgba(255,255,255,.15)
+      width:44px;height:44px;border-radius:14px;
+      display:grid;place-items:center;font-weight:900;letter-spacing:-1px;
+      background:linear-gradient(145deg,var(--accent),#1565d8 60%,var(--accent2));
+      box-shadow:0 8px 24px rgba(39,182,255,.25);
+      flex:none;
     }
-    .brand strong{display:block;font-size:14px;letter-spacing:.35px}
-    .brand small{display:block;color:var(--muted);font-size:9.5px;margin-top:2px}
-    .pill{
-      border:1px solid var(--line);background:rgba(16,36,61,.86);border-radius:999px;
-      color:var(--muted);padding:8px 10px;font-size:9px;font-weight:900
+    .brand strong{font-size:16px;display:block;line-height:1.05}
+    .brand span{display:block;color:var(--muted);font-size:11px;margin-top:4px;letter-spacing:.4px}
+    .top-actions{display:flex;gap:8px}
+    .mini-btn{
+      border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);
+      padding:9px 12px;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer
     }
+
     .hero{
-      margin-top:4px;padding:20px;border:1px solid rgba(59,130,246,.24);border-radius:24px;
-      background:
-        radial-gradient(circle at 95% 0,rgba(34,211,238,.18),transparent 34%),
-        linear-gradient(145deg,rgba(37,99,235,.16),rgba(11,27,48,.96));
-      box-shadow:var(--shadow)
+      padding:40px 0 22px;
+      display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:stretch
     }
-    .eyebrow{font-size:9px;font-weight:1000;letter-spacing:1.4px;color:var(--cyan)}
-    h1{font-size:27px;line-height:1.08;margin:7px 0 6px}
-    .hero p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.55}
-    .search{margin-top:15px;display:grid;grid-template-columns:1fr auto;gap:8px}
-    .search input,textarea{
-      min-width:0;padding:13px 14px;border-radius:14px;border:1px solid var(--line);
-      background:#08182b;color:var(--text);outline:none
+    .hero-main,.hero-side,.card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(16,43,73,.86),rgba(10,29,50,.92));
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
     }
-    .search input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+    .hero-main{padding:32px;position:relative;overflow:hidden}
+    .hero-main:after{
+      content:"";position:absolute;width:220px;height:220px;border-radius:50%;
+      right:-70px;top:-80px;background:radial-gradient(circle,rgba(39,182,255,.24),transparent 67%);
+      pointer-events:none
+    }
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      color:#bfeaff;background:rgba(39,182,255,.10);
+      border:1px solid rgba(39,182,255,.22);
+      padding:7px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.8px
+    }
+    .hero h1{font-size:clamp(34px,6vw,62px);line-height:.98;margin:18px 0 13px;letter-spacing:-2.5px}
+    .hero h1 .rk{color:var(--accent)}
+    .hero h1 .sell{color:var(--accent2)}
+    .hero p{margin:0;color:var(--muted);font-size:15px;line-height:1.75;max-width:720px}
+    .hero-values{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .value-chip{
+      padding:9px 12px;border-radius:14px;background:rgba(255,255,255,.045);
+      border:1px solid var(--line);font-size:12px;font-weight:800;color:#dff5ff
+    }
+    .hero-side{padding:22px;display:flex;flex-direction:column;justify-content:space-between}
+    .trust-title{font-size:13px;font-weight:900;color:#dcecff;margin-bottom:12px}
+    .trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .trust-item{
+      padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)
+    }
+    .trust-item b{display:block;font-size:19px;margin-bottom:3px}
+    .trust-item span{font-size:11px;color:var(--muted);line-height:1.45}
+    .cta{
+      margin-top:16px;display:flex;gap:10px;flex-wrap:wrap
+    }
     .btn{
-      border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,#2563eb,#0891b2);
-      color:#fff;font-weight:950;cursor:pointer
+      border:0;cursor:pointer;font-weight:900;border-radius:14px;padding:12px 15px;font-size:13px
     }
-    .btn.secondary{background:#10243d;border:1px solid var(--line)}
-    .btn:disabled{opacity:.55;cursor:not-allowed}
-    .statusline{margin-top:10px;min-height:18px;color:var(--muted);font-size:9.5px}
-    .statusline.err{color:#fca5a5}.statusline.ok{color:#86efac}
-    .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 2px 8px}
-    .section-title b{font-size:10.5px;letter-spacing:.9px}
-    .section-title span{font-size:8.5px;color:var(--muted)}
-    .promo-wrap{display:none;margin-top:14px}.promo-wrap.show{display:block}
-    .promo-track{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-    .promo-track::-webkit-scrollbar{display:none}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),#147ce5);color:white}
+    .btn-secondary{background:rgba(255,255,255,.06);color:white;border:1px solid var(--line)}
+    .btn-wa{background:#1ecf6b;color:#042512}
+
+    .lookup{padding:18px;margin:8px 0 22px}
+    .lookup-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .lookup-title strong{font-size:14px}
+    .lookup-title span{font-size:11px;color:var(--muted)}
+    .lookup-row{display:flex;gap:10px}
+    .input{
+      flex:1;min-width:0;border:1px solid var(--line);background:#07182a;color:white;
+      border-radius:14px;padding:14px 15px;font-size:14px;outline:none
+    }
+    .input:focus{border-color:rgba(39,182,255,.55);box-shadow:0 0 0 3px rgba(39,182,255,.09)}
+    .status-msg{font-size:12px;color:var(--muted);margin-top:10px;min-height:18px}
+
+    .service-shell{display:none;gap:18px;padding-bottom:42px}
+    .service-shell.active{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(290px,.8fr)}
+    .stack{display:grid;gap:18px}
+    .card{padding:20px}
+    .card h2,.card h3{margin:0}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .section-head h2{font-size:18px}
+    .section-head p{margin:3px 0 0;color:var(--muted);font-size:11px}
+    .badge{
+      display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:999px;
+      font-size:11px;font-weight:900;border:1px solid var(--line)
+    }
+    .status-waiting{background:rgba(245,158,11,.10);color:#ffd481;border-color:rgba(245,158,11,.25)}
+    .status-progress{background:rgba(39,182,255,.10);color:#bfeaff;border-color:rgba(39,182,255,.25)}
+    .status-done{background:rgba(34,197,94,.11);color:#aaf3bf;border-color:rgba(34,197,94,.24)}
+    .status-bad{background:rgba(239,68,68,.10);color:#ffb0b0;border-color:rgba(239,68,68,.24)}
+
+    .summary{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px
+    }
+    .info{
+      padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)
+    }
+    .info .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+    .info .v{font-size:14px;font-weight:850;margin-top:6px;word-break:break-word}
+    .info.full{grid-column:1/-1}
+
+    .progress{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+    .step{text-align:center;position:relative}
+    .dot{
+      width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin:0 auto 7px;
+      border:1px solid var(--line);background:#0a1d31;color:#7290ab;font-size:10px;font-weight:900
+    }
+    .step.active .dot{background:linear-gradient(135deg,var(--accent),#1877d5);color:white;border-color:transparent}
+    .step.done .dot{background:var(--success);color:white;border-color:transparent}
+    .step small{font-size:9px;color:var(--muted);line-height:1.25;display:block}
+    .step.done small,.step.active small{color:#e9f8ff;font-weight:800}
+
+    .qc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .qc-card{padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+    .qc-card h4{margin:0 0 10px;font-size:13px}
+    .qc-list{display:grid;gap:7px}
+    .qc-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;padding-bottom:7px;border-bottom:1px dashed rgba(255,255,255,.08)}
+    .qc-row:last-child{border-bottom:0;padding-bottom:0}
+    .qc-row span:first-child{color:#c9d8e7}
+    .qc-ok{color:#98f3b3;font-weight:800}
+    .qc-problem{color:#ffb9b9;font-weight:800}
+    .qc-neutral{color:#a9bed1;font-weight:800}
+
+    .warranty-box{
+      padding:18px;border-radius:18px;background:
+      linear-gradient(145deg,rgba(255,154,47,.12),rgba(39,182,255,.08));
+      border:1px solid rgba(255,154,47,.22)
+    }
+    .warranty-big{font-size:28px;font-weight:950;letter-spacing:-1px;margin:4px 0}
+    .muted{color:var(--muted)}
+    .small{font-size:11px}
+    .promo-grid{display:grid;gap:10px}
     .promo{
-      min-width:min(315px,83vw);padding:14px;border-radius:18px;
-      background:linear-gradient(145deg,rgba(146,64,14,.78),rgba(124,45,18,.73));
-      border:1px solid rgba(245,158,11,.28)
+      border:1px solid rgba(255,154,47,.22);background:rgba(255,154,47,.06);
+      border-radius:16px;padding:14px
     }
-    .promo strong{display:block;font-size:12.5px}.promo p{font-size:10px;line-height:1.5;color:#ffedd5;min-height:31px}
-    .promo-meta{display:flex;gap:6px;flex-wrap:wrap}
-    .promo-meta span{font-size:8.5px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.1)}
-    #result{margin-top:14px}
-    .card{
-      margin-top:10px;padding:15px;border-radius:18px;border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(16,36,61,.93),rgba(11,27,48,.96));box-shadow:0 12px 30px rgba(0,0,0,.12)
+    .promo strong{display:block;color:#ffd7a0;margin-bottom:4px}
+    .promo p{margin:0;color:#d5c0a6;font-size:11px;line-height:1.5}
+
+    .sell-card{
+      background:
+        radial-gradient(circle at 100% 0%,rgba(39,182,255,.16),transparent 32%),
+        linear-gradient(180deg,#102b49,#0c2036)
     }
-    .ticket-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-    .ticket-id{font-size:9.5px;color:var(--cyan);font-weight:950}
-    .device{font-size:19px;font-weight:1000;margin-top:4px}.customer{font-size:10.5px;color:var(--muted);margin-top:3px}
-    .badge{padding:7px 9px;border-radius:999px;font-size:8.5px;font-weight:1000;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.1)}
-    .progress{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:14px}
-    .step{height:5px;border-radius:999px;background:#19314c}.step.on{background:linear-gradient(90deg,#2563eb,#22d3ee)}
-    .steps-label{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-top:6px}
-    .steps-label span{text-align:center;font-size:6.5px;color:#6f89a7;overflow:hidden;text-overflow:ellipsis}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-    .info{padding:11px;border-radius:13px;border:1px solid var(--line);background:#0a1a2f}
-    .info b{display:block;color:var(--muted);font-size:7.5px;letter-spacing:.65px;text-transform:uppercase}
-    .info span{display:block;margin-top:4px;font-size:10.5px;font-weight:850;word-break:break-word}
-    .qc-list{display:grid;gap:6px;margin-top:9px}
-    .qc-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:11px;background:#09192d;border:1px solid rgba(31,54,83,.8)}
-    .qc-row span:first-child{font-size:10px;font-weight:780}
-    .qc-status{font-size:7.5px;font-weight:1000;padding:5px 7px;border-radius:999px}
-    .ok{background:rgba(34,197,94,.11);color:#86efac}.problem{background:rgba(239,68,68,.11);color:#fca5a5}
-    .cant{background:rgba(245,158,11,.11);color:#fcd34d}.na{background:rgba(148,163,184,.12);color:#cbd5e1}
-    .note{margin-top:9px;padding:10px;border-radius:11px;background:#08182b;color:var(--muted);font-size:9.5px;line-height:1.5}
-    .warranty-box{padding:14px;border-radius:16px;border:1px solid rgba(34,197,94,.22);background:linear-gradient(135deg,rgba(34,197,94,.09),rgba(16,36,61,.85))}
-    .warranty-big{font-size:18px;font-weight:1000;margin-top:4px}
-    .muted{color:var(--muted);font-size:9.5px;line-height:1.5}
-    .stars{display:flex;gap:5px}.star{appearance:none;border:0;background:transparent;color:#425a75;font-size:29px;padding:0;cursor:pointer}.star.on{color:#fbbf24}
-    .testimonial-old{margin-bottom:11px;padding:11px;border-radius:12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.17)}
-    textarea{min-height:92px;resize:vertical}
-    .action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
-    .footer{text-align:center;color:var(--muted);font-size:8.5px;line-height:1.65;margin-top:24px}
-    .empty{text-align:center;padding:22px;color:var(--muted);font-size:10.5px}
-    .hidden{display:none!important}
-    @media(max-width:620px){
-      .app{padding:9px 10px 30px}.topbar{padding-top:6px}.hero{padding:16px;border-radius:20px}
-      h1{font-size:22px}.search{grid-template-columns:1fr}.grid{grid-template-columns:1fr}
-      .ticket-head{flex-direction:column}.badge{align-self:flex-start}.steps-label span{font-size:5.8px}
-      .pill{display:none}
+    .sell-card .lead{font-size:20px;font-weight:950;line-height:1.16;letter-spacing:-.5px}
+    .sell-card .lead span{color:var(--accent2)}
+    .sell-points{display:grid;gap:10px;margin-top:15px}
+    .sell-point{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#d7e6f3}
+    .sell-icon{
+      flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;
+      background:rgba(39,182,255,.10);border:1px solid rgba(39,182,255,.16)
+    }
+
+    .rating{display:flex;gap:7px;margin:10px 0 12px}
+    .star{
+      font-size:25px;background:none;border:0;color:#50677e;padding:0;cursor:pointer
+    }
+    .star.active{color:#ffc857}
+    textarea{
+      width:100%;min-height:96px;resize:vertical;background:#07182a;color:white;border:1px solid var(--line);
+      border-radius:14px;padding:12px;font:inherit;font-size:12px;outline:none
+    }
+
+    .empty{
+      padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px
+    }
+    footer{
+      padding:22px 0 36px;color:#6f879e;font-size:11px;text-align:center
+    }
+
+    @media(max-width:860px){
+      .hero{grid-template-columns:1fr;padding-top:24px}
+      .service-shell.active{grid-template-columns:1fr}
+      .hero-main{padding:24px}
+      .hero h1{font-size:42px}
+    }
+    @media(max-width:560px){
+      .wrap{width:min(100% - 20px,1120px)}
+      .topbar .inner{min-height:60px}
+      .brand span{display:none}
+      .hero{gap:14px}
+      .hero-main,.hero-side,.card{border-radius:18px}
+      .hero-main{padding:20px}
+      .hero-side{padding:16px}
+      .hero h1{font-size:36px;letter-spacing:-1.8px}
+      .hero p{font-size:13px}
+      .trust-grid{grid-template-columns:1fr 1fr}
+      .lookup-row{flex-direction:column}
+      .summary{grid-template-columns:1fr}
+      .info.full{grid-column:auto}
+      .progress{gap:3px}
+      .dot{width:24px;height:24px;font-size:9px}
+      .step small{font-size:8px}
+      .qc-grid{grid-template-columns:1fr}
+      .top-actions .mini-btn:first-child{display:none}
     }
   </style>
 </head>
 <body>
-<main class="app">
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">RK</div>
-      <div><strong>RK CELL SERVICE</strong><small>Cepat • Akurat • Transparan</small></div>
-    </div>
-    <div class="pill">TRACKING RESMI</div>
-  </header>
-
-  <section class="hero">
-    <div class="eyebrow">SERVICE TRACKING • RK CELL</div>
-    <h1>Pantau servis HP Anda</h1>
-    <p>Status pengerjaan, QC awal & akhir, IMEI, masa garansi, promo aktif, dan testimoni dalam satu halaman.</p>
-    <div class="search">
-      <input id="ticketInput" autocomplete="off" placeholder="Contoh: SRV-20260914-0001">
-      <button class="btn" id="trackBtn">CEK TRACKING</button>
-    </div>
-    <div id="statusline" class="statusline"></div>
-  </section>
-
-  <section id="promoWrap" class="promo-wrap">
-    <div class="section-title"><b>🎁 PROMO SEDANG BERJALAN</b><span>Promo aktif RK CELL</span></div>
-    <div id="promoTrack" class="promo-track"></div>
-  </section>
-
-  <section id="result"></section>
-
-  <footer class="footer">
-    RK CELL SERVICE • Jalan Veteran, Belakang POS Curup<br>
-    Informasi ditampilkan langsung dari sistem RK CELL. Data sensitif tidak ditampilkan penuh.
-  </footer>
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL='https://qobrmwqrawkixdjevcji.supabase.co';
-const SUPABASE_KEY='sb_publishable_axRHboFphJ8FqG5mH4DY-g_UeXFKNhf';
-
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
-  auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
-});
-
-const $=id=>document.getElementById(id);
-const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const int=v=>Number.isFinite(Number(v))?Number(v):0;
-
-function setStatus(text,type=''){
-  const el=$('statusline'); el.textContent=text||''; el.className='statusline'+(type?' '+type:'');
-}
-function ticketFromUrl(){return (new URLSearchParams(location.search).get('t')||'').trim().toUpperCase()}
-function fmtDate(v,withTime=true){
-  if(!v)return '-'; const d=new Date(v); if(isNaN(d))return String(v);
-  const s=new Intl.DateTimeFormat('id-ID',{
-    day:'2-digit',month:'2-digit',year:'numeric',
-    ...(withTime?{hour:'2-digit',minute:'2-digit'}:{}),timeZone:'Asia/Jakarta'
-  }).format(d);
-  return s.replace(',',' •');
-}
-function maskImei(v){
-  const s=String(v||'').replace(/\s+/g,'');
-  if(!s)return '-';
-  if(s.length<=7)return s;
-  return s.slice(0,4)+'••••••'+s.slice(-4);
-}
-function statusLabel(s,picked){
-  if(picked)return 'HP SUDAH DIAMBIL';
-  const m={waiting:'MENUNGGU',masuk:'MENUNGGU',diagnosis:'DIAGNOSA',confirmation:'MENUNGGU KONFIRMASI',
-    process:'PROSES',processing:'PROSES',in_progress:'PROSES',quality:'QUALITY CONTROL',qc:'QUALITY CONTROL',
-    completed:'SELESAI • SIAP DIAMBIL',pending:'PENDING',cancelled:'DIBATALKAN',
-    unrepairable:'TIDAK BISA DIPERBAIKI',cannot_repair:'TIDAK BISA DIPERBAIKI'};
-  return m[String(s||'').toLowerCase()]||String(s||'BELUM ADA STATUS').toUpperCase();
-}
-function progressCount(s,picked){
-  if(picked)return 6;
-  return ({waiting:1,masuk:1,diagnosis:2,confirmation:3,process:4,processing:4,in_progress:4,quality:5,qc:5,completed:6})[String(s||'').toLowerCase()]||1;
-}
-function qcArray(value){
-  if(Array.isArray(value))return value;
-  if(value&&typeof value==='object'){
-    if(Array.isArray(value.items))return value.items;
-    if(value.qc&&typeof value.qc==='object'){
-      const out=[];
-      Object.entries(value.qc).forEach(([cat,vals])=>{
-        if(Array.isArray(vals))vals.forEach(v=>out.push({label:`${cat}: ${v}`,status:''}));
-        else if(vals)out.push({label:`${cat}: ${vals}`,status:''});
-      });
-      return out;
-    }
-  }
-  return [];
-}
-function qcStatusClass(v){
-  const s=String(v||'').toUpperCase();
-  if(['NORMAL','OK','PASS','BAIK'].includes(s))return 'ok';
-  if(['PROBLEM','BERMASALAH','FAIL','ERROR'].includes(s))return 'problem';
-  if(['CANNOT_TEST','TIDAK BISA DITES','CANT_TEST'].includes(s))return 'cant';
-  return 'na';
-}
-function qcHtml(items){
-  if(!items.length)return '<div class="empty">Belum ada data QC.</div>';
-  return `<div class="qc-list">${items.map(x=>{
-    const label=x.label||x.name||x.title||'Pemeriksaan';
-    const st=x.status||x.value||'';
-    return `<div class="qc-row"><span>${esc(label)}</span><span class="qc-status ${qcStatusClass(st)}">${esc(st||'TERCATAT')}</span></div>`;
-  }).join('')}</div>`;
-}
-function warrantyData(r){
-  const base=int(r.warranty_days),extra=int(r.promo_warranty_extra_days),total=Math.max(0,base+extra);
-  const picked=r.picked_up_at||r.final_receipt_printed_at||null;
-  let until=null;
-  if(total>0&&picked){const d=new Date(picked);if(!isNaN(d)){d.setDate(d.getDate()+total);until=d}}
-  return {base,extra,total,picked,until};
-}
-function warrantyHtml(r){
-  const w=warrantyData(r);
-  if(w.total<=0){
-    return `<div class="warranty-box"><div class="muted">GARANSI SERVICE</div><div class="warranty-big">TANPA GARANSI</div><div class="muted">${esc(r.warranty_terms||'Tidak ada masa garansi tercatat.')}</div></div>`;
-  }
-  if(!w.picked){
-    return `<div class="warranty-box"><div class="muted">GARANSI SERVICE</div><div class="warranty-big">${w.total} HARI • BELUM DIMULAI</div><div class="muted">Garansi mulai saat HP diserahkan/diambil pelanggan.${w.extra>0?` • Dasar ${w.base} hari + promo ${w.extra} hari.`:''}</div></div>`;
-  }
-  const active=w.until&&w.until>new Date();
-  return `<div class="warranty-box"><div class="muted">GARANSI SERVICE</div><div class="warranty-big">${active?'AKTIF':'BERAKHIR'} • ${w.total} HARI</div><div class="muted">Mulai ${fmtDate(w.picked,false)} • Batas garansi <strong>${fmtDate(w.until,false)}</strong>${w.extra>0?` • Termasuk promo +${w.extra} hari.`:''}</div></div>`;
-}
-function promoType(p){return String(p?.reward_type||p?.type||'').toLowerCase()}
-function promoDate(v){if(!v)return null;const d=new Date(v);return isNaN(d)?null:d}
-function promoActive(p){
-  if(p?.active===false)return false;
-  const type=promoType(p); if(type&&type!=='promo')return false;
-  const now=new Date(),start=promoDate(p?.start_at||p?.start_date),end=promoDate(p?.end_at||p?.end_date);
-  if(start&&start>now)return false;
-  if(end){end.setHours(23,59,59,999);if(end<now)return false}
-  return true;
-}
-function promoPeriod(p){
-  const s=promoDate(p?.start_at||p?.start_date),e=promoDate(p?.end_at||p?.end_date);
-  if(s&&e)return `${fmtDate(s,false)} — ${fmtDate(e,false)}`;
-  if(s)return `Mulai ${fmtDate(s,false)}`; if(e)return `Sampai ${fmtDate(e,false)}`; return 'Sedang aktif';
-}
-function renderPromos(rows){
-  const list=(Array.isArray(rows)?rows:[]).filter(promoActive);
-  if(!list.length){$('promoWrap').classList.remove('show');$('promoTrack').innerHTML='';return}
-  $('promoTrack').innerHTML=list.map(p=>`<article class="promo">
-    <strong>🎁 ${esc(p.reward_name||p.name||'Promo RK CELL')}</strong>
-    <p>${esc(p.description||'Promo aktif untuk pelanggan RK CELL.')}</p>
-    <div class="promo-meta">
-      <span>🗓 ${esc(promoPeriod(p))}</span>
-      ${p.badge?`<span>⚡ ${esc(p.badge)}</span>`:''}
-      ${int(p.points_required)>0?`<span>${int(p.points_required)} poin</span>`:''}
-    </div>
-  </article>`).join('');
-  $('promoWrap').classList.add('show');
-}
-async function loadPromos(){
-  try{
-    const q=await sb.rpc('get_member_active_promos');
-    if(!q.error&&Array.isArray(q.data)){renderPromos(q.data);return}
-  }catch(_){}
-  try{
-    const q=await sb.from('rewards').select('*').eq('active',true).order('points_required',{ascending:true});
-    if(!q.error){renderPromos(q.data||[]);return}
-  }catch(_){}
-  try{
-    const q=await sb.from('rk_promos').select('*').eq('active',true).order('created_at',{ascending:false});
-    if(!q.error){renderPromos(q.data||[]);return}
-  }catch(_){}
-  renderPromos([]);
-}
-function serviceFieldsEnhanced(){
-  return 'id,ticket_number,status,device_brand,device_model,device_type,imei,complaint,estimated_done_at,created_at,updated_at,completed_at,final_completed_at,warranty_terms,warranty_days,promo_warranty_extra_days,initial_checklist,final_checklist,picked_up_at,final_receipt_printed_at,repair_summary,promo_name,promo_benefit_label,customer_rating,customer_testimonial,members(name)';
-}
-function serviceFieldsLegacy(){
-  return 'id,ticket_number,status,device_brand,device_model,device_type,complaint,estimated_done_at,created_at,completed_at,final_completed_at,warranty_terms,final_checklist,final_receipt_printed_at,repair_summary,promo_name,promo_benefit_label,customer_rating,customer_testimonial,members(name)';
-}
-async function fetchService(ticket){
-  let q=await sb.from('service_orders').select(serviceFieldsEnhanced()).eq('ticket_number',ticket).limit(1).maybeSingle();
-  if(q.error){
-    q=await sb.from('service_orders').select(serviceFieldsLegacy()).eq('ticket_number',ticket).limit(1).maybeSingle();
-  }
-  if(q.error)throw q.error;
-  return q.data||null;
-}
-function info(label,value){return `<div class="info"><b>${esc(label)}</b><span>${esc(value||'-')}</span></div>`}
-function renderService(r){
-  const picked=!!(r.picked_up_at||r.final_receipt_printed_at);
-  const pc=progressCount(r.status,picked);
-  const qcBefore=qcArray(r.initial_checklist),qcAfter=qcArray(r.final_checklist);
-  const customer=r.members?.name||'Pelanggan RK CELL';
-  const finish=r.final_completed_at||r.completed_at||null;
-  const stars=int(r.customer_rating);
-  $('result').innerHTML=`
-    <div class="card">
-      <div class="ticket-head">
+  <div class="topbar">
+    <div class="wrap inner">
+      <div class="brand">
+        <div class="logo">RK</div>
         <div>
-          <div class="ticket-id">${esc(r.ticket_number||'')}</div>
-          <div class="device">${esc([r.device_brand,r.device_model].filter(Boolean).join(' ')||'PERANGKAT')}</div>
-          <div class="customer">${esc(customer)}</div>
+          <strong>RK CELL SERVICE</strong>
+          <span>CEPAT • AKURAT • TRANSPARAN</span>
         </div>
-        <div class="badge">${esc(statusLabel(r.status,picked))}</div>
       </div>
-      <div class="progress">${[1,2,3,4,5,6].map(i=>`<span class="step ${i<=pc?'on':''}"></span>`).join('')}</div>
-      <div class="steps-label"><span>MASUK</span><span>DIAGNOSA</span><span>KONFIRMASI</span><span>PROSES</span><span>QC</span><span>SELESAI</span></div>
-      <div class="grid">
-        ${info('Status',statusLabel(r.status,picked))}
-        ${info('IMEI (disamarkan)',maskImei(r.imei))}
-        ${info('Tanggal Masuk',fmtDate(r.created_at))}
-        ${info('Estimasi Selesai',fmtDate(r.estimated_done_at))}
-        ${info('Tanggal Selesai',finish?fmtDate(finish):'-')}
-        ${info('Tanggal Diambil',picked?fmtDate(r.picked_up_at||r.final_receipt_printed_at):'-')}
-        ${info('Keluhan',r.complaint||'-')}
-        ${info('Tindakan',r.repair_summary||'-')}
+      <div class="top-actions">
+        <button class="mini-btn" onclick="document.getElementById('tracking').scrollIntoView()">Tracking</button>
+        <button class="mini-btn" onclick="openWA()">WhatsApp</button>
       </div>
     </div>
+  </div>
 
-    <div class="section-title"><b>🧪 QC AWAL</b><span>Sebelum pengerjaan</span></div>
-    <div class="card">${qcHtml(qcBefore)}</div>
-
-    <div class="section-title"><b>✅ QC AKHIR</b><span>Setelah pengerjaan</span></div>
-    <div class="card">
-      ${qcHtml(qcAfter)}
-      ${r.repair_summary?`<div class="note"><strong>Catatan teknisi:</strong><br>${esc(r.repair_summary)}</div>`:''}
-    </div>
-
-    <div class="section-title"><b>🛡️ GARANSI</b><span>Berlaku setelah unit diambil</span></div>
-    <div class="card">${warrantyHtml(r)}
-      ${r.promo_name?`<div class="note">🎁 Promo service: <strong>${esc(r.promo_name)}</strong>${r.promo_benefit_label?` • ${esc(r.promo_benefit_label)}`:''}</div>`:''}
-    </div>
-
-    <div class="section-title"><b>💬 TESTIMONI</b><span>Bagikan pengalaman service Anda</span></div>
-    <div class="card">
-      ${(stars>0||r.customer_testimonial)?`<div class="testimonial-old"><strong>${'★'.repeat(Math.min(5,stars))}${'☆'.repeat(Math.max(0,5-stars))}</strong><div class="muted" style="margin-top:5px">${esc(r.customer_testimonial||'Pelanggan telah memberikan rating.')}</div></div>`:''}
-      <div class="stars" id="stars">${[1,2,3,4,5].map(n=>`<button type="button" class="star ${n<=stars?'on':''}" data-n="${n}" aria-label="${n} bintang">★</button>`).join('')}</div>
-      <textarea id="testimonialText" maxlength="500" placeholder="Ceritakan pengalaman service Anda di RK CELL...">${esc(r.customer_testimonial||'')}</textarea>
-      <div class="action-row">
-        <button class="btn" id="sendTestimonial">KIRIM TESTIMONI</button>
-        <button class="btn secondary" id="shareTrack">SALIN LINK</button>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-main">
+        <div class="eyebrow">● TRACKING SERVICE DIGITAL</div>
+        <h1>Service HP <span class="rk">lebih jelas.</span><br><span class="sell">Lebih terpercaya.</span></h1>
+        <p>
+          Di RK CELL, pelanggan tidak hanya menitipkan perangkat. Anda bisa memantau progres,
+          melihat pemeriksaan sebelum dan sesudah service, serta mengetahui garansi dengan lebih transparan.
+        </p>
+        <div class="hero-values">
+          <div class="value-chip">✓ Status Service</div>
+          <div class="value-chip">✓ QC Sebelum & Sesudah</div>
+          <div class="value-chip">✓ Garansi Jelas</div>
+          <div class="value-chip">✓ Riwayat Perbaikan</div>
+        </div>
       </div>
-      <div id="testimonialStatus" class="statusline"></div>
-    </div>
-  `;
-  bindTestimonial(r.ticket_number,stars);
-  $('shareTrack').onclick=async()=>{
-    await navigator.clipboard?.writeText(location.href);
-    $('testimonialStatus').textContent='✅ Link tracking disalin.';
-  };
-}
-function bindTestimonial(ticket,current){
-  let rating=Math.max(0,Math.min(5,int(current)));
-  const paint=()=>document.querySelectorAll('.star').forEach(b=>b.classList.toggle('on',int(b.dataset.n)<=rating));
-  document.querySelectorAll('.star').forEach(b=>b.onclick=()=>{rating=int(b.dataset.n);paint()});
-  $('sendTestimonial').onclick=async()=>{
-    const text=$('testimonialText').value.trim(),status=$('testimonialStatus'),btn=$('sendTestimonial');
-    if(!rating){status.textContent='Pilih rating 1–5 bintang.';return}
-    if(!text){status.textContent='Tulis testimoni singkat terlebih dahulu.';return}
-    btn.disabled=true;status.textContent='Menyimpan testimoni...';
-    try{
-      let q=await sb.rpc('submit_service_testimonial',{p_ticket:ticket,p_rating:rating,p_testimonial:text});
-      if(q.error){
-        q=await sb.from('service_orders').update({customer_rating:rating,customer_testimonial:text}).eq('ticket_number',ticket).select('ticket_number').maybeSingle();
+
+      <div class="hero-side">
+        <div>
+          <div class="trust-title">KENAPA SERVICE DI RK CELL?</div>
+          <div class="trust-grid">
+            <div class="trust-item"><b>01</b><span>Pemeriksaan perangkat lebih terstruktur</span></div>
+            <div class="trust-item"><b>02</b><span>Progress dapat dipantau lewat invoice</span></div>
+            <div class="trust-item"><b>03</b><span>QC akhir sebelum perangkat diserahkan</span></div>
+            <div class="trust-item"><b>04</b><span>Garansi tercatat dan mudah dicek kembali</span></div>
+          </div>
+        </div>
+        <div class="cta">
+          <button class="btn btn-primary" onclick="document.getElementById('tracking').scrollIntoView()">Cek Service Saya</button>
+          <button class="btn btn-wa" onclick="openWA()">Konsultasi WhatsApp</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card lookup" id="tracking">
+      <div class="lookup-title">
+        <div>
+          <strong>TRACKING SERVICE</strong>
+          <div class="small muted">Masukkan nomor invoice / tiket service</div>
+        </div>
+        <span>RK CELL DIGITAL SERVICE</span>
+      </div>
+      <div class="lookup-row">
+        <input id="ticketInput" class="input" placeholder="Contoh: SRV-20260914-0001" autocomplete="off" />
+        <button class="btn btn-primary" onclick="loadTracking()">CEK TRACKING</button>
+      </div>
+      <div id="statusMsg" class="status-msg"></div>
+    </section>
+
+    <section id="serviceShell" class="service-shell">
+      <div class="stack">
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Detail Service</h2>
+              <p>Informasi utama perangkat dan progres perbaikan</p>
+            </div>
+            <div id="statusBadge" class="badge status-progress">MEMUAT</div>
+          </div>
+          <div id="summaryGrid" class="summary"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Progress Service</h2>
+              <p>Perjalanan perangkat Anda di RK CELL</p>
+            </div>
+          </div>
+          <div id="progressBar" class="progress"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Quality Control</h2>
+              <p>Pemeriksaan sebelum dan sesudah pengerjaan</p>
+            </div>
+          </div>
+          <div class="qc-grid">
+            <div class="qc-card">
+              <h4>QC AWAL</h4>
+              <div id="qcInitial" class="qc-list"></div>
+            </div>
+            <div class="qc-card">
+              <h4>QC AKHIR</h4>
+              <div id="qcFinal" class="qc-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Testimoni Pelanggan</h2>
+              <p>Bantu RK CELL terus meningkatkan pelayanan</p>
+            </div>
+          </div>
+          <div id="testimonialSaved" class="small muted" style="margin-bottom:10px"></div>
+          <div class="rating" id="ratingStars">
+            <button class="star" data-v="1">★</button>
+            <button class="star" data-v="2">★</button>
+            <button class="star" data-v="3">★</button>
+            <button class="star" data-v="4">★</button>
+            <button class="star" data-v="5">★</button>
+          </div>
+          <textarea id="testimonialText" maxlength="500" placeholder="Ceritakan pengalaman service Anda di RK CELL..."></textarea>
+          <div class="cta">
+            <button class="btn btn-primary" onclick="submitTestimonial()">Kirim Testimoni</button>
+          </div>
+          <div id="testimonialMsg" class="status-msg"></div>
+        </section>
+      </div>
+
+      <aside class="stack">
+        <section class="card sell-card">
+          <div class="eyebrow">NILAI LAYANAN RK CELL</div>
+          <div class="lead" style="margin-top:13px">Bukan sekadar <span>memperbaiki HP.</span><br>Kami membuat prosesnya lebih jelas.</div>
+          <div class="sell-points">
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Transparan</b><br><span class="muted">Status dan tahapan service dapat dipantau.</span></div></div>
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Terukur</b><br><span class="muted">QC membantu membandingkan kondisi sebelum dan sesudah.</span></div></div>
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Lebih Aman</b><br><span class="muted">Garansi dan histori service tersimpan berdasarkan invoice.</span></div></div>
+            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Lebih Mudah</b><br><span class="muted">Satu QR untuk memantau perkembangan service.</span></div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div><h2>Garansi Service</h2><p>Informasi garansi sesuai pekerjaan</p></div>
+          </div>
+          <div id="warrantyBox" class="warranty-box">
+            <div class="small muted">GARANSI</div>
+            <div class="warranty-big">—</div>
+            <div class="small muted">Menunggu data service.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div><h2>Promo Aktif</h2><p>Program yang sedang tersedia di RK CELL</p></div>
+          </div>
+          <div id="promoGrid" class="promo-grid">
+            <div class="empty">Memuat promo...</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div><h2>Butuh Bantuan?</h2><p>Hubungi admin RK CELL</p></div>
+          </div>
+          <div class="cta">
+            <button class="btn btn-wa" style="width:100%" onclick="openWA()">Chat WhatsApp RK CELL</button>
+          </div>
+          <div class="small muted" style="margin-top:12px;line-height:1.6">
+            Jalan Veteran, Belakang POS Curup<br>
+            Melayani Sepenuh Hati
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <footer>
+      RK CELL SERVICE • Cepat • Akurat • Transparan<br>
+      Sistem tracking digital untuk pengalaman service yang lebih jelas.
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://qobrmwqrawkixdjevcji.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_axRHboFphJ8FqG5mH4DY-g_UeXFKNhf';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const WA_NUMBER = '6285148495045';
+    let currentTicket = '';
+    let currentOrder = null;
+    let selectedRating = 0;
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    const fmtDate = v => {
+      if(!v) return '—';
+      const d = new Date(v);
+      if(Number.isNaN(d.getTime())) return '—';
+      return new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(d);
+    };
+    const fmtDateOnly = v => {
+      if(!v) return '—';
+      const d = new Date(v);
+      if(Number.isNaN(d.getTime())) return '—';
+      return new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
+    };
+    const maskImei = imei => {
+      const s = String(imei || '').trim();
+      if(!s) return '—';
+      if(s.length <= 8) return s;
+      return s.slice(0,4) + '•••••••' + s.slice(-4);
+    };
+    const normStatus = s => String(s||'').toLowerCase().trim();
+
+    function openWA(){
+      const text = currentTicket
+        ? `Halo RK CELL, saya ingin menanyakan service ${currentTicket}.`
+        : 'Halo RK CELL, saya ingin konsultasi service.';
+      location.href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+    }
+
+    function statusInfo(status){
+      const s = normStatus(status);
+      if(['completed','selesai'].includes(s)) return ['SELESAI','status-done'];
+      if(['picked_up','diambil','picked'].includes(s)) return ['SUDAH DIAMBIL','status-done'];
+      if(['cancel','cancelled','dibatalkan','tidak_bisa_diperbaiki'].includes(s)) return ['DITUTUP','status-bad'];
+      if(['waiting','masuk','pending','awaiting_confirmation'].includes(s)) return ['MENUNGGU','status-waiting'];
+      if(['diagnosis','diagnosa','in_progress','proses','quality','quality_control'].includes(s)) return ['DIPROSES','status-progress'];
+      return [String(status||'PROSES').toUpperCase(),'status-progress'];
+    }
+
+    function progressIndex(status){
+      const s = normStatus(status);
+      if(['waiting','masuk'].includes(s)) return 0;
+      if(['diagnosis','diagnosa'].includes(s)) return 1;
+      if(['awaiting_confirmation','konfirmasi'].includes(s)) return 2;
+      if(['in_progress','proses','pending'].includes(s)) return 3;
+      if(['quality','quality_control','qc'].includes(s)) return 4;
+      if(['completed','selesai','picked_up','diambil','picked'].includes(s)) return 5;
+      return 0;
+    }
+
+    function renderProgress(status){
+      const labels = ['Masuk','Diagnosa','Konfirmasi','Proses','QC','Selesai'];
+      const idx = progressIndex(status);
+      $('progressBar').innerHTML = labels.map((x,i)=>{
+        const cls = i < idx ? 'step done' : (i===idx ? 'step active' : 'step');
+        return `<div class="${cls}"><div class="dot">${i < idx ? '✓' : i+1}</div><small>${x}</small></div>`;
+      }).join('');
+    }
+
+    function flattenQc(data){
+      if(!data) return [];
+      let src = data;
+      if(typeof src === 'string'){
+        try{ src = JSON.parse(src); }catch{ return []; }
       }
-      if(q.error)throw q.error;
-      status.textContent='✅ Terima kasih. Testimoni berhasil disimpan.';
-    }catch(e){
-      status.textContent='❌ Testimoni belum dapat disimpan. Admin perlu mengaktifkan izin/RPC testimoni.';
-    }finally{btn.disabled=false}
-  };
-}
-async function track(ticket){
-  ticket=String(ticket||'').trim().toUpperCase();
-  if(!ticket){setStatus('Masukkan nomor tiket service.','err');return}
-  $('ticketInput').value=ticket;
-  setStatus('Mengambil data service terbaru...');
-  $('trackBtn').disabled=true;
-  try{
-    const row=await fetchService(ticket);
-    if(!row){$('result').innerHTML='<div class="card empty">Tiket tidak ditemukan. Periksa kembali nomor tiket.</div>';setStatus('Tiket tidak ditemukan.','err');return}
-    renderService(row);
-    setStatus('Data tracking terbaru berhasil dimuat.','ok');
-    const u=new URL(location.href);u.searchParams.set('t',ticket);history.replaceState(null,'',u);
-  }catch(e){
-    console.error(e);
-    $('result').innerHTML='<div class="card empty">Data tracking belum dapat dibuka. Pastikan koneksi Supabase dan RLS tracking publik sudah aktif.</div>';
-    setStatus('Gagal mengambil data tracking.','err');
-  }finally{$('trackBtn').disabled=false}
-}
-$('trackBtn').onclick=()=>track($('ticketInput').value);
-$('ticketInput').addEventListener('keydown',e=>{if(e.key==='Enter')track(e.target.value)});
-loadPromos();
-setInterval(loadPromos,180000);
-const initial=ticketFromUrl();
-if(initial){$('ticketInput').value=initial;track(initial)}
-</script>
+      if(Array.isArray(src)){
+        return src.map((x,i)=>{
+          if(typeof x === 'string') return {name:x,status:'NORMAL'};
+          return {
+            name:x.name || x.label || x.item || x.title || `Item ${i+1}`,
+            status:x.status || x.result || x.value || x.state || ''
+          };
+        });
+      }
+      if(src.items && Array.isArray(src.items)) return flattenQc(src.items);
+      if(src.qc && typeof src.qc === 'object') return flattenQc(src.qc);
+      if(typeof src === 'object'){
+        return Object.entries(src).map(([k,v])=>{
+          if(v && typeof v==='object') return {name:v.name||v.label||k,status:v.status||v.result||v.value||''};
+          return {name:k,status:String(v ?? '')};
+        });
+      }
+      return [];
+    }
+
+    function qcClass(status){
+      const s = String(status||'').toUpperCase();
+      if(['NORMAL','OK','PASS','BAIK','GOOD','BERFUNGSI'].some(x=>s.includes(x))) return 'qc-ok';
+      if(['PROBLEM','RUSAK','FAIL','ERROR','BERMASALAH'].some(x=>s.includes(x))) return 'qc-problem';
+      return 'qc-neutral';
+    }
+
+    function renderQc(target,data){
+      const rows = flattenQc(data);
+      if(!rows.length){
+        $(target).innerHTML = '<div class="small muted">Belum ada data QC.</div>';
+        return;
+      }
+      $(target).innerHTML = rows.slice(0,40).map(x=>`
+        <div class="qc-row">
+          <span>${esc(x.name)}</span>
+          <span class="${qcClass(x.status)}">${esc(x.status || '—')}</span>
+        </div>`).join('');
+    }
+
+    function renderWarranty(o){
+      const base = Number(o.warranty_days || 0);
+      const extra = Number(o.promo_warranty_extra_days || 0);
+      const total = Math.max(0,base+extra);
+      const startRaw = o.picked_up_at || o.final_receipt_printed_at || null;
+      const box = $('warrantyBox');
+
+      if(total <= 0){
+        box.innerHTML = `
+          <div class="small muted">GARANSI SERVICE</div>
+          <div class="warranty-big">Tanpa Garansi</div>
+          <div class="small muted">${esc(o.warranty_terms || 'Mengikuti ketentuan pekerjaan/service yang dilakukan.')}</div>`;
+        return;
+      }
+
+      if(!startRaw){
+        box.innerHTML = `
+          <div class="small muted">GARANSI SERVICE</div>
+          <div class="warranty-big">${total} Hari</div>
+          <div class="small muted">Garansi mulai dihitung saat perangkat diserahkan kepada pelanggan.</div>`;
+        return;
+      }
+
+      const start = new Date(startRaw);
+      const end = new Date(start);
+      end.setDate(end.getDate()+total);
+      const now = new Date();
+      const active = now <= end;
+
+      box.innerHTML = `
+        <div class="small muted">GARANSI SERVICE</div>
+        <div class="warranty-big">${total} Hari</div>
+        <div class="small" style="font-weight:900;color:${active?'#9df1b6':'#ffb0b0'}">${active?'GARANSI AKTIF':'GARANSI SELESAI'}</div>
+        <div class="small muted" style="margin-top:9px;line-height:1.6">
+          Mulai: ${fmtDateOnly(start)}<br>
+          Berakhir: ${fmtDateOnly(end)}
+          ${extra>0?`<br>Bonus promo: +${extra} hari`:''}
+        </div>`;
+    }
+
+    function renderSummary(o){
+      const customer = o.members?.name || o.customer_name || o.member_name || '—';
+      const device = [o.device_brand,o.device_model].filter(Boolean).join(' ') || o.device_type || '—';
+      $('summaryGrid').innerHTML = `
+        <div class="info"><div class="k">No. Invoice</div><div class="v">${esc(o.ticket_number)}</div></div>
+        <div class="info"><div class="k">Pelanggan</div><div class="v">${esc(customer)}</div></div>
+        <div class="info"><div class="k">Perangkat</div><div class="v">${esc(device)}</div></div>
+        <div class="info"><div class="k">IMEI / Serial</div><div class="v">${esc(maskImei(o.imei || o.imei1 || o.serial_number))}</div></div>
+        <div class="info full"><div class="k">Keluhan</div><div class="v">${esc(o.complaint || '—')}</div></div>
+        <div class="info full"><div class="k">Tindakan / Hasil</div><div class="v">${esc(o.repair_summary || 'Belum ada ringkasan tindakan.')}</div></div>
+        <div class="info"><div class="k">Tanggal Masuk</div><div class="v">${fmtDate(o.created_at)}</div></div>
+        <div class="info"><div class="k">Estimasi</div><div class="v">${fmtDate(o.estimated_done_at)}</div></div>
+      `;
+    }
+
+    async function fetchTracking(ticket){
+      const enhanced = `
+        id,ticket_number,status,device_brand,device_model,device_type,imei,imei1,complaint,
+        estimated_done_at,created_at,updated_at,completed_at,final_completed_at,
+        warranty_terms,warranty_days,promo_warranty_extra_days,initial_checklist,final_checklist,
+        picked_up_at,final_receipt_printed_at,repair_summary,promo_name,promo_benefit_label,
+        customer_rating,customer_testimonial,members(name)
+      `.replace(/\s+/g,'');
+      let r = await sb.from('service_orders').select(enhanced).eq('ticket_number',ticket).maybeSingle();
+
+      if(r.error){
+        const legacy = `
+          id,ticket_number,status,device_brand,device_model,device_type,complaint,
+          estimated_done_at,created_at,updated_at,completed_at,final_completed_at,
+          warranty_terms,initial_checklist,final_checklist,final_receipt_printed_at,
+          repair_summary,promo_name,promo_benefit_label,members(name)
+        `.replace(/\s+/g,'');
+        r = await sb.from('service_orders').select(legacy).eq('ticket_number',ticket).maybeSingle();
+      }
+      return r;
+    }
+
+    async function loadTracking(){
+      const ticket = $('ticketInput').value.trim().toUpperCase();
+      if(!ticket){
+        $('statusMsg').textContent = 'Masukkan nomor invoice terlebih dahulu.';
+        return;
+      }
+      currentTicket = ticket;
+      $('statusMsg').textContent = 'Mengambil data service...';
+      $('serviceShell').classList.remove('active');
+
+      const {data,error} = await fetchTracking(ticket);
+      if(error){
+        console.error(error);
+        $('statusMsg').textContent = 'Data tracking belum dapat diambil. Hubungi admin RK CELL jika masalah berlanjut.';
+        return;
+      }
+      if(!data){
+        $('statusMsg').textContent = 'Nomor invoice tidak ditemukan.';
+        return;
+      }
+
+      currentOrder = data;
+      const [label,cls] = statusInfo(data.status);
+      $('statusBadge').className = `badge ${cls}`;
+      $('statusBadge').textContent = label;
+
+      renderSummary(data);
+      renderProgress(data.status);
+      renderQc('qcInitial',data.initial_checklist);
+      renderQc('qcFinal',data.final_checklist);
+      renderWarranty(data);
+
+      if(data.customer_rating){
+        selectedRating = Number(data.customer_rating);
+        refreshStars();
+      }
+      if(data.customer_testimonial){
+        $('testimonialSaved').textContent = `Testimoni tersimpan: "${data.customer_testimonial}"`;
+        $('testimonialText').value = data.customer_testimonial;
+      } else {
+        $('testimonialSaved').textContent = '';
+        $('testimonialText').value = '';
+      }
+
+      $('serviceShell').classList.add('active');
+      $('statusMsg').textContent = `Tracking ditemukan • terakhir diperbarui ${fmtDate(data.updated_at || data.created_at)}`;
+      history.replaceState(null,'',`?t=${encodeURIComponent(ticket)}`);
+      setTimeout(()=>$('serviceShell').scrollIntoView({behavior:'smooth',block:'start'}),100);
+    }
+
+    function refreshStars(){
+      document.querySelectorAll('.star').forEach(s=>{
+        s.classList.toggle('active',Number(s.dataset.v)<=selectedRating);
+      });
+    }
+    document.querySelectorAll('.star').forEach(s=>{
+      s.addEventListener('click',()=>{
+        selectedRating=Number(s.dataset.v);
+        refreshStars();
+      });
+    });
+
+    async function submitTestimonial(){
+      const txt = $('testimonialText').value.trim();
+      if(!currentTicket){
+        $('testimonialMsg').textContent='Buka data service terlebih dahulu.';
+        return;
+      }
+      if(selectedRating<1 || selectedRating>5){
+        $('testimonialMsg').textContent='Pilih rating 1–5 bintang.';
+        return;
+      }
+      if(!txt){
+        $('testimonialMsg').textContent='Isi testimoni terlebih dahulu.';
+        return;
+      }
+
+      $('testimonialMsg').textContent='Mengirim testimoni...';
+      let rpc = await sb.rpc('submit_service_testimonial',{
+        p_ticket:currentTicket,
+        p_rating:selectedRating,
+        p_testimonial:txt
+      });
+
+      if(rpc.error){
+        const up = await sb.from('service_orders')
+          .update({customer_rating:selectedRating,customer_testimonial:txt})
+          .eq('ticket_number',currentTicket);
+        if(up.error){
+          console.error(rpc.error,up.error);
+          $('testimonialMsg').textContent='Testimoni belum dapat dikirim. Hubungi admin RK CELL.';
+          return;
+        }
+      }
+      $('testimonialMsg').textContent='Terima kasih. Testimoni Anda sudah tersimpan.';
+      $('testimonialSaved').textContent=`Testimoni tersimpan: "${txt}"`;
+    }
+
+    async function loadPromos(){
+      const grid = $('promoGrid');
+      let rows = [];
+
+      try{
+        const rpc = await sb.rpc('get_member_active_promos');
+        if(!rpc.error && Array.isArray(rpc.data)) rows = rpc.data;
+      }catch(e){}
+
+      if(!rows.length){
+        try{
+          const r = await sb.from('rewards').select('*').eq('active',true);
+          if(!r.error && Array.isArray(r.data)) rows = r.data;
+        }catch(e){}
+      }
+
+      if(!rows.length){
+        grid.innerHTML='<div class="empty">Belum ada promo aktif saat ini.</div>';
+        return;
+      }
+
+      const now = new Date();
+      rows = rows.filter(x=>{
+        const type = String(x.type || x.reward_type || '').toLowerCase();
+        if(type && type !== 'promo') return false;
+        if(x.active === false) return false;
+        const start = x.start_at || x.start_date;
+        const end = x.end_at || x.end_date;
+        if(start && new Date(start) > now) return false;
+        if(end){
+          const d = new Date(end);
+          if(String(end).length<=10) d.setHours(23,59,59,999);
+          if(d < now) return false;
+        }
+        return true;
+      }).slice(0,6);
+
+      if(!rows.length){
+        grid.innerHTML='<div class="empty">Belum ada promo aktif saat ini.</div>';
+        return;
+      }
+
+      grid.innerHTML=rows.map(x=>`
+        <div class="promo">
+          <strong>${esc(x.reward_name || x.name || x.title || 'Promo RK CELL')}</strong>
+          <p>${esc(x.description || x.benefit || x.promo_benefit_label || 'Hubungi admin untuk detail promo.')}</p>
+        </div>`).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      loadPromos();
+      const p = new URLSearchParams(location.search);
+      const t = (p.get('t') || '').trim();
+      if(t){
+        $('ticketInput').value=t.toUpperCase();
+        loadTracking();
+      }
+      $('ticketInput').addEventListener('keydown',e=>{
+        if(e.key==='Enter') loadTracking();
+      });
+    });
+  </script>
 </body>
 </html>
