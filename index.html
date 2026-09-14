@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071426">
+  <meta name="description" content="Tracking Service RK CELL: status, QC awal/akhir, IMEI, garansi, promo aktif, dan testimoni.">
+  <title>RK CELL • Tracking Service</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect rx=%2216%22 width=%2264%22 height=%2264%22 fill=%22%232563eb%22/><text x=%2232%22 y=%2240%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2223%22 font-weight=%22900%22 fill=%22white%22>RK</text></svg>">
+  <style>
+    :root{
+      --bg:#071426;--panel:#0b1b30;--panel2:#10243d;--line:#1f3653;
+      --text:#eff6ff;--muted:#8fa8c5;--blue:#3b82f6;--cyan:#22d3ee;
+      --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#a78bfa;
+      --shadow:0 20px 55px rgba(0,0,0,.28)
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;min-height:100vh;color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+      background:
+        radial-gradient(circle at 95% -10%,rgba(37,99,235,.20),transparent 29%),
+        radial-gradient(circle at 4% 36%,rgba(34,211,238,.08),transparent 25%),
+        linear-gradient(180deg,#06111f,#071426 45%,#081525)
+    }
+    button,input,textarea{font:inherit}
+    .app{max-width:920px;margin:auto;padding:12px 14px 38px}
+    .topbar{
+      position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 0 14px;background:linear-gradient(180deg,rgba(7,20,38,.98),rgba(7,20,38,.86),transparent);
+      backdrop-filter:blur(10px)
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{
+      width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+      background:linear-gradient(135deg,#2563eb,#06b6d4);font-weight:1000;letter-spacing:-1px;
+      box-shadow:0 10px 28px rgba(37,99,235,.32);border:1px solid rgba(255,255,255,.15)
+    }
+    .brand strong{display:block;font-size:14px;letter-spacing:.35px}
+    .brand small{display:block;color:var(--muted);font-size:9.5px;margin-top:2px}
+    .pill{
+      border:1px solid var(--line);background:rgba(16,36,61,.86);border-radius:999px;
+      color:var(--muted);padding:8px 10px;font-size:9px;font-weight:900
+    }
+    .hero{
+      margin-top:4px;padding:20px;border:1px solid rgba(59,130,246,.24);border-radius:24px;
+      background:
+        radial-gradient(circle at 95% 0,rgba(34,211,238,.18),transparent 34%),
+        linear-gradient(145deg,rgba(37,99,235,.16),rgba(11,27,48,.96));
+      box-shadow:var(--shadow)
+    }
+    .eyebrow{font-size:9px;font-weight:1000;letter-spacing:1.4px;color:var(--cyan)}
+    h1{font-size:27px;line-height:1.08;margin:7px 0 6px}
+    .hero p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.55}
+    .search{margin-top:15px;display:grid;grid-template-columns:1fr auto;gap:8px}
+    .search input,textarea{
+      min-width:0;padding:13px 14px;border-radius:14px;border:1px solid var(--line);
+      background:#08182b;color:var(--text);outline:none
+    }
+    .search input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+    .btn{
+      border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,#2563eb,#0891b2);
+      color:#fff;font-weight:950;cursor:pointer
+    }
+    .btn.secondary{background:#10243d;border:1px solid var(--line)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .statusline{margin-top:10px;min-height:18px;color:var(--muted);font-size:9.5px}
+    .statusline.err{color:#fca5a5}.statusline.ok{color:#86efac}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 2px 8px}
+    .section-title b{font-size:10.5px;letter-spacing:.9px}
+    .section-title span{font-size:8.5px;color:var(--muted)}
+    .promo-wrap{display:none;margin-top:14px}.promo-wrap.show{display:block}
+    .promo-track{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+    .promo-track::-webkit-scrollbar{display:none}
+    .promo{
+      min-width:min(315px,83vw);padding:14px;border-radius:18px;
+      background:linear-gradient(145deg,rgba(146,64,14,.78),rgba(124,45,18,.73));
+      border:1px solid rgba(245,158,11,.28)
+    }
+    .promo strong{display:block;font-size:12.5px}.promo p{font-size:10px;line-height:1.5;color:#ffedd5;min-height:31px}
+    .promo-meta{display:flex;gap:6px;flex-wrap:wrap}
+    .promo-meta span{font-size:8.5px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.1)}
+    #result{margin-top:14px}
+    .card{
+      margin-top:10px;padding:15px;border-radius:18px;border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(16,36,61,.93),rgba(11,27,48,.96));box-shadow:0 12px 30px rgba(0,0,0,.12)
+    }
+    .ticket-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .ticket-id{font-size:9.5px;color:var(--cyan);font-weight:950}
+    .device{font-size:19px;font-weight:1000;margin-top:4px}.customer{font-size:10.5px;color:var(--muted);margin-top:3px}
+    .badge{padding:7px 9px;border-radius:999px;font-size:8.5px;font-weight:1000;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.1)}
+    .progress{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:14px}
+    .step{height:5px;border-radius:999px;background:#19314c}.step.on{background:linear-gradient(90deg,#2563eb,#22d3ee)}
+    .steps-label{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-top:6px}
+    .steps-label span{text-align:center;font-size:6.5px;color:#6f89a7;overflow:hidden;text-overflow:ellipsis}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .info{padding:11px;border-radius:13px;border:1px solid var(--line);background:#0a1a2f}
+    .info b{display:block;color:var(--muted);font-size:7.5px;letter-spacing:.65px;text-transform:uppercase}
+    .info span{display:block;margin-top:4px;font-size:10.5px;font-weight:850;word-break:break-word}
+    .qc-list{display:grid;gap:6px;margin-top:9px}
+    .qc-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:11px;background:#09192d;border:1px solid rgba(31,54,83,.8)}
+    .qc-row span:first-child{font-size:10px;font-weight:780}
+    .qc-status{font-size:7.5px;font-weight:1000;padding:5px 7px;border-radius:999px}
+    .ok{background:rgba(34,197,94,.11);color:#86efac}.problem{background:rgba(239,68,68,.11);color:#fca5a5}
+    .cant{background:rgba(245,158,11,.11);color:#fcd34d}.na{background:rgba(148,163,184,.12);color:#cbd5e1}
+    .note{margin-top:9px;padding:10px;border-radius:11px;background:#08182b;color:var(--muted);font-size:9.5px;line-height:1.5}
+    .warranty-box{padding:14px;border-radius:16px;border:1px solid rgba(34,197,94,.22);background:linear-gradient(135deg,rgba(34,197,94,.09),rgba(16,36,61,.85))}
+    .warranty-big{font-size:18px;font-weight:1000;margin-top:4px}
+    .muted{color:var(--muted);font-size:9.5px;line-height:1.5}
+    .stars{display:flex;gap:5px}.star{appearance:none;border:0;background:transparent;color:#425a75;font-size:29px;padding:0;cursor:pointer}.star.on{color:#fbbf24}
+    .testimonial-old{margin-bottom:11px;padding:11px;border-radius:12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.17)}
+    textarea{min-height:92px;resize:vertical}
+    .action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+    .footer{text-align:center;color:var(--muted);font-size:8.5px;line-height:1.65;margin-top:24px}
+    .empty{text-align:center;padding:22px;color:var(--muted);font-size:10.5px}
+    .hidden{display:none!important}
+    @media(max-width:620px){
+      .app{padding:9px 10px 30px}.topbar{padding-top:6px}.hero{padding:16px;border-radius:20px}
+      h1{font-size:22px}.search{grid-template-columns:1fr}.grid{grid-template-columns:1fr}
+      .ticket-head{flex-direction:column}.badge{align-self:flex-start}.steps-label span{font-size:5.8px}
+      .pill{display:none}
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">RK</div>
+      <div><strong>RK CELL SERVICE</strong><small>Cepat • Akurat • Transparan</small></div>
+    </div>
+    <div class="pill">TRACKING RESMI</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">SERVICE TRACKING • RK CELL</div>
+    <h1>Pantau servis HP Anda</h1>
+    <p>Status pengerjaan, QC awal & akhir, IMEI, masa garansi, promo aktif, dan testimoni dalam satu halaman.</p>
+    <div class="search">
+      <input id="ticketInput" autocomplete="off" placeholder="Contoh: SRV-20260914-0001">
+      <button class="btn" id="trackBtn">CEK TRACKING</button>
+    </div>
+    <div id="statusline" class="statusline"></div>
+  </section>
+
+  <section id="promoWrap" class="promo-wrap">
+    <div class="section-title"><b>🎁 PROMO SEDANG BERJALAN</b><span>Promo aktif RK CELL</span></div>
+    <div id="promoTrack" class="promo-track"></div>
+  </section>
+
+  <section id="result"></section>
+
+  <footer class="footer">
+    RK CELL SERVICE • Jalan Veteran, Belakang POS Curup<br>
+    Informasi ditampilkan langsung dari sistem RK CELL. Data sensitif tidak ditampilkan penuh.
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://qobrmwqrawkixdjevcji.supabase.co';
+const SUPABASE_KEY='sb_publishable_axRHboFphJ8FqG5mH4DY-g_UeXFKNhf';
+
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+  auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+});
+
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const int=v=>Number.isFinite(Number(v))?Number(v):0;
+
+function setStatus(text,type=''){
+  const el=$('statusline'); el.textContent=text||''; el.className='statusline'+(type?' '+type:'');
+}
+function ticketFromUrl(){return (new URLSearchParams(location.search).get('t')||'').trim().toUpperCase()}
+function fmtDate(v,withTime=true){
+  if(!v)return '-'; const d=new Date(v); if(isNaN(d))return String(v);
+  const s=new Intl.DateTimeFormat('id-ID',{
+    day:'2-digit',month:'2-digit',year:'numeric',
+    ...(withTime?{hour:'2-digit',minute:'2-digit'}:{}),timeZone:'Asia/Jakarta'
+  }).format(d);
+  return s.replace(',',' •');
+}
+function maskImei(v){
+  const s=String(v||'').replace(/\s+/g,'');
+  if(!s)return '-';
+  if(s.length<=7)return s;
+  return s.slice(0,4)+'••••••'+s.slice(-4);
+}
+function statusLabel(s,picked){
+  if(picked)return 'HP SUDAH DIAMBIL';
+  const m={waiting:'MENUNGGU',masuk:'MENUNGGU',diagnosis:'DIAGNOSA',confirmation:'MENUNGGU KONFIRMASI',
+    process:'PROSES',processing:'PROSES',in_progress:'PROSES',quality:'QUALITY CONTROL',qc:'QUALITY CONTROL',
+    completed:'SELESAI • SIAP DIAMBIL',pending:'PENDING',cancelled:'DIBATALKAN',
+    unrepairable:'TIDAK BISA DIPERBAIKI',cannot_repair:'TIDAK BISA DIPERBAIKI'};
+  return m[String(s||'').toLowerCase()]||String(s||'BELUM ADA STATUS').toUpperCase();
+}
+function progressCount(s,picked){
+  if(picked)return 6;
+  return ({waiting:1,masuk:1,diagnosis:2,confirmation:3,process:4,processing:4,in_progress:4,quality:5,qc:5,completed:6})[String(s||'').toLowerCase()]||1;
+}
+function qcArray(value){
+  if(Array.isArray(value))return value;
+  if(value&&typeof value==='object'){
+    if(Array.isArray(value.items))return value.items;
+    if(value.qc&&typeof value.qc==='object'){
+      const out=[];
+      Object.entries(value.qc).forEach(([cat,vals])=>{
+        if(Array.isArray(vals))vals.forEach(v=>out.push({label:`${cat}: ${v}`,status:''}));
+        else if(vals)out.push({label:`${cat}: ${vals}`,status:''});
+      });
+      return out;
+    }
+  }
+  return [];
+}
+function qcStatusClass(v){
+  const s=String(v||'').toUpperCase();
+  if(['NORMAL','OK','PASS','BAIK'].includes(s))return 'ok';
+  if(['PROBLEM','BERMASALAH','FAIL','ERROR'].includes(s))return 'problem';
+  if(['CANNOT_TEST','TIDAK BISA DITES','CANT_TEST'].includes(s))return 'cant';
+  return 'na';
+}
+function qcHtml(items){
+  if(!items.length)return '<div class="empty">Belum ada data QC.</div>';
+  return `<div class="qc-list">${items.map(x=>{
+    const label=x.label||x.name||x.title||'Pemeriksaan';
+    const st=x.status||x.value||'';
+    return `<div class="qc-row"><span>${esc(label)}</span><span class="qc-status ${qcStatusClass(st)}">${esc(st||'TERCATAT')}</span></div>`;
+  }).join('')}</div>`;
+}
+function warrantyData(r){
+  const base=int(r.warranty_days),extra=int(r.promo_warranty_extra_days),total=Math.max(0,base+extra);
+  const picked=r.picked_up_at||r.final_receipt_printed_at||null;
+  let until=null;
+  if(total>0&&picked){const d=new Date(picked);if(!isNaN(d)){d.setDate(d.getDate()+total);until=d}}
+  return {base,extra,total,picked,until};
+}
+function warrantyHtml(r){
+  const w=warrantyData(r);
+  if(w.total<=0){
+    return `<div class="warranty-box"><div class="muted">GARANSI SERVICE</div><div class="warranty-big">TANPA GARANSI</div><div class="muted">${esc(r.warranty_terms||'Tidak ada masa garansi tercatat.')}</div></div>`;
+  }
+  if(!w.picked){
+    return `<div class="warranty-box"><div class="muted">GARANSI SERVICE</div><div class="warranty-big">${w.total} HARI • BELUM DIMULAI</div><div class="muted">Garansi mulai saat HP diserahkan/diambil pelanggan.${w.extra>0?` • Dasar ${w.base} hari + promo ${w.extra} hari.`:''}</div></div>`;
+  }
+  const active=w.until&&w.until>new Date();
+  return `<div class="warranty-box"><div class="muted">GARANSI SERVICE</div><div class="warranty-big">${active?'AKTIF':'BERAKHIR'} • ${w.total} HARI</div><div class="muted">Mulai ${fmtDate(w.picked,false)} • Batas garansi <strong>${fmtDate(w.until,false)}</strong>${w.extra>0?` • Termasuk promo +${w.extra} hari.`:''}</div></div>`;
+}
+function promoType(p){return String(p?.reward_type||p?.type||'').toLowerCase()}
+function promoDate(v){if(!v)return null;const d=new Date(v);return isNaN(d)?null:d}
+function promoActive(p){
+  if(p?.active===false)return false;
+  const type=promoType(p); if(type&&type!=='promo')return false;
+  const now=new Date(),start=promoDate(p?.start_at||p?.start_date),end=promoDate(p?.end_at||p?.end_date);
+  if(start&&start>now)return false;
+  if(end){end.setHours(23,59,59,999);if(end<now)return false}
+  return true;
+}
+function promoPeriod(p){
+  const s=promoDate(p?.start_at||p?.start_date),e=promoDate(p?.end_at||p?.end_date);
+  if(s&&e)return `${fmtDate(s,false)} — ${fmtDate(e,false)}`;
+  if(s)return `Mulai ${fmtDate(s,false)}`; if(e)return `Sampai ${fmtDate(e,false)}`; return 'Sedang aktif';
+}
+function renderPromos(rows){
+  const list=(Array.isArray(rows)?rows:[]).filter(promoActive);
+  if(!list.length){$('promoWrap').classList.remove('show');$('promoTrack').innerHTML='';return}
+  $('promoTrack').innerHTML=list.map(p=>`<article class="promo">
+    <strong>🎁 ${esc(p.reward_name||p.name||'Promo RK CELL')}</strong>
+    <p>${esc(p.description||'Promo aktif untuk pelanggan RK CELL.')}</p>
+    <div class="promo-meta">
+      <span>🗓 ${esc(promoPeriod(p))}</span>
+      ${p.badge?`<span>⚡ ${esc(p.badge)}</span>`:''}
+      ${int(p.points_required)>0?`<span>${int(p.points_required)} poin</span>`:''}
+    </div>
+  </article>`).join('');
+  $('promoWrap').classList.add('show');
+}
+async function loadPromos(){
+  try{
+    const q=await sb.rpc('get_member_active_promos');
+    if(!q.error&&Array.isArray(q.data)){renderPromos(q.data);return}
+  }catch(_){}
+  try{
+    const q=await sb.from('rewards').select('*').eq('active',true).order('points_required',{ascending:true});
+    if(!q.error){renderPromos(q.data||[]);return}
+  }catch(_){}
+  try{
+    const q=await sb.from('rk_promos').select('*').eq('active',true).order('created_at',{ascending:false});
+    if(!q.error){renderPromos(q.data||[]);return}
+  }catch(_){}
+  renderPromos([]);
+}
+function serviceFieldsEnhanced(){
+  return 'id,ticket_number,status,device_brand,device_model,device_type,imei,complaint,estimated_done_at,created_at,updated_at,completed_at,final_completed_at,warranty_terms,warranty_days,promo_warranty_extra_days,initial_checklist,final_checklist,picked_up_at,final_receipt_printed_at,repair_summary,promo_name,promo_benefit_label,customer_rating,customer_testimonial,members(name)';
+}
+function serviceFieldsLegacy(){
+  return 'id,ticket_number,status,device_brand,device_model,device_type,complaint,estimated_done_at,created_at,completed_at,final_completed_at,warranty_terms,final_checklist,final_receipt_printed_at,repair_summary,promo_name,promo_benefit_label,customer_rating,customer_testimonial,members(name)';
+}
+async function fetchService(ticket){
+  let q=await sb.from('service_orders').select(serviceFieldsEnhanced()).eq('ticket_number',ticket).limit(1).maybeSingle();
+  if(q.error){
+    q=await sb.from('service_orders').select(serviceFieldsLegacy()).eq('ticket_number',ticket).limit(1).maybeSingle();
+  }
+  if(q.error)throw q.error;
+  return q.data||null;
+}
+function info(label,value){return `<div class="info"><b>${esc(label)}</b><span>${esc(value||'-')}</span></div>`}
+function renderService(r){
+  const picked=!!(r.picked_up_at||r.final_receipt_printed_at);
+  const pc=progressCount(r.status,picked);
+  const qcBefore=qcArray(r.initial_checklist),qcAfter=qcArray(r.final_checklist);
+  const customer=r.members?.name||'Pelanggan RK CELL';
+  const finish=r.final_completed_at||r.completed_at||null;
+  const stars=int(r.customer_rating);
+  $('result').innerHTML=`
+    <div class="card">
+      <div class="ticket-head">
+        <div>
+          <div class="ticket-id">${esc(r.ticket_number||'')}</div>
+          <div class="device">${esc([r.device_brand,r.device_model].filter(Boolean).join(' ')||'PERANGKAT')}</div>
+          <div class="customer">${esc(customer)}</div>
+        </div>
+        <div class="badge">${esc(statusLabel(r.status,picked))}</div>
+      </div>
+      <div class="progress">${[1,2,3,4,5,6].map(i=>`<span class="step ${i<=pc?'on':''}"></span>`).join('')}</div>
+      <div class="steps-label"><span>MASUK</span><span>DIAGNOSA</span><span>KONFIRMASI</span><span>PROSES</span><span>QC</span><span>SELESAI</span></div>
+      <div class="grid">
+        ${info('Status',statusLabel(r.status,picked))}
+        ${info('IMEI (disamarkan)',maskImei(r.imei))}
+        ${info('Tanggal Masuk',fmtDate(r.created_at))}
+        ${info('Estimasi Selesai',fmtDate(r.estimated_done_at))}
+        ${info('Tanggal Selesai',finish?fmtDate(finish):'-')}
+        ${info('Tanggal Diambil',picked?fmtDate(r.picked_up_at||r.final_receipt_printed_at):'-')}
+        ${info('Keluhan',r.complaint||'-')}
+        ${info('Tindakan',r.repair_summary||'-')}
+      </div>
+    </div>
+
+    <div class="section-title"><b>🧪 QC AWAL</b><span>Sebelum pengerjaan</span></div>
+    <div class="card">${qcHtml(qcBefore)}</div>
+
+    <div class="section-title"><b>✅ QC AKHIR</b><span>Setelah pengerjaan</span></div>
+    <div class="card">
+      ${qcHtml(qcAfter)}
+      ${r.repair_summary?`<div class="note"><strong>Catatan teknisi:</strong><br>${esc(r.repair_summary)}</div>`:''}
+    </div>
+
+    <div class="section-title"><b>🛡️ GARANSI</b><span>Berlaku setelah unit diambil</span></div>
+    <div class="card">${warrantyHtml(r)}
+      ${r.promo_name?`<div class="note">🎁 Promo service: <strong>${esc(r.promo_name)}</strong>${r.promo_benefit_label?` • ${esc(r.promo_benefit_label)}`:''}</div>`:''}
+    </div>
+
+    <div class="section-title"><b>💬 TESTIMONI</b><span>Bagikan pengalaman service Anda</span></div>
+    <div class="card">
+      ${(stars>0||r.customer_testimonial)?`<div class="testimonial-old"><strong>${'★'.repeat(Math.min(5,stars))}${'☆'.repeat(Math.max(0,5-stars))}</strong><div class="muted" style="margin-top:5px">${esc(r.customer_testimonial||'Pelanggan telah memberikan rating.')}</div></div>`:''}
+      <div class="stars" id="stars">${[1,2,3,4,5].map(n=>`<button type="button" class="star ${n<=stars?'on':''}" data-n="${n}" aria-label="${n} bintang">★</button>`).join('')}</div>
+      <textarea id="testimonialText" maxlength="500" placeholder="Ceritakan pengalaman service Anda di RK CELL...">${esc(r.customer_testimonial||'')}</textarea>
+      <div class="action-row">
+        <button class="btn" id="sendTestimonial">KIRIM TESTIMONI</button>
+        <button class="btn secondary" id="shareTrack">SALIN LINK</button>
+      </div>
+      <div id="testimonialStatus" class="statusline"></div>
+    </div>
+  `;
+  bindTestimonial(r.ticket_number,stars);
+  $('shareTrack').onclick=async()=>{
+    await navigator.clipboard?.writeText(location.href);
+    $('testimonialStatus').textContent='✅ Link tracking disalin.';
+  };
+}
+function bindTestimonial(ticket,current){
+  let rating=Math.max(0,Math.min(5,int(current)));
+  const paint=()=>document.querySelectorAll('.star').forEach(b=>b.classList.toggle('on',int(b.dataset.n)<=rating));
+  document.querySelectorAll('.star').forEach(b=>b.onclick=()=>{rating=int(b.dataset.n);paint()});
+  $('sendTestimonial').onclick=async()=>{
+    const text=$('testimonialText').value.trim(),status=$('testimonialStatus'),btn=$('sendTestimonial');
+    if(!rating){status.textContent='Pilih rating 1–5 bintang.';return}
+    if(!text){status.textContent='Tulis testimoni singkat terlebih dahulu.';return}
+    btn.disabled=true;status.textContent='Menyimpan testimoni...';
+    try{
+      let q=await sb.rpc('submit_service_testimonial',{p_ticket:ticket,p_rating:rating,p_testimonial:text});
+      if(q.error){
+        q=await sb.from('service_orders').update({customer_rating:rating,customer_testimonial:text}).eq('ticket_number',ticket).select('ticket_number').maybeSingle();
+      }
+      if(q.error)throw q.error;
+      status.textContent='✅ Terima kasih. Testimoni berhasil disimpan.';
+    }catch(e){
+      status.textContent='❌ Testimoni belum dapat disimpan. Admin perlu mengaktifkan izin/RPC testimoni.';
+    }finally{btn.disabled=false}
+  };
+}
+async function track(ticket){
+  ticket=String(ticket||'').trim().toUpperCase();
+  if(!ticket){setStatus('Masukkan nomor tiket service.','err');return}
+  $('ticketInput').value=ticket;
+  setStatus('Mengambil data service terbaru...');
+  $('trackBtn').disabled=true;
+  try{
+    const row=await fetchService(ticket);
+    if(!row){$('result').innerHTML='<div class="card empty">Tiket tidak ditemukan. Periksa kembali nomor tiket.</div>';setStatus('Tiket tidak ditemukan.','err');return}
+    renderService(row);
+    setStatus('Data tracking terbaru berhasil dimuat.','ok');
+    const u=new URL(location.href);u.searchParams.set('t',ticket);history.replaceState(null,'',u);
+  }catch(e){
+    console.error(e);
+    $('result').innerHTML='<div class="card empty">Data tracking belum dapat dibuka. Pastikan koneksi Supabase dan RLS tracking publik sudah aktif.</div>';
+    setStatus('Gagal mengambil data tracking.','err');
+  }finally{$('trackBtn').disabled=false}
+}
+$('trackBtn').onclick=()=>track($('ticketInput').value);
+$('ticketInput').addEventListener('keydown',e=>{if(e.key==='Enter')track(e.target.value)});
+loadPromos();
+setInterval(loadPromos,180000);
+const initial=ticketFromUrl();
+if(initial){$('ticketInput').value=initial;track(initial)}
+</script>
+</body>
+</html>
