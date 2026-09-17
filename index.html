@@ -589,8 +589,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://qobrmwqrawkixdjevcji.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_axRHboFphJ8FqG5mH4DY-g_UeXFKNhf';
+    const SUPABASE_URL = 'https://qvgswujpyrvlhdxjcgiq.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_9bgWXKuB-25rpKPxkgT5Bw_chmJ7osL';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const WA_NUMBER = '6285148495045';
@@ -740,86 +740,43 @@
     }
 
     function renderWarranty(o){
-      const base = Number(o.warranty_days || 0);
-      const extra = Number(o.promo_warranty_extra_days || 0);
-      const total = Math.max(0, base + extra);
-      const startRaw = o.picked_up_at || o.final_receipt_printed_at || null;
       const box = $('warrantyBox');
-
-      if(total <= 0){
-        box.innerHTML = `
-          <div class="small muted">GARANSI SERVICE</div>
-          <div class="warranty-big">TANPA GARANSI</div>
-          <div class="warranty-state">TIDAK ADA MASA GARANSI</div>
-          <div class="warranty-dates">${esc(upperText(o.warranty_terms || 'MENGIKUTI KETENTUAN SERVICE YANG DILAKUKAN.'))}</div>`;
-        return;
-      }
-
-      if(!startRaw){
-        box.innerHTML = `
-          <div class="small muted">GARANSI SERVICE</div>
-          <div class="warranty-big">${total} HARI</div>
-          <div class="warranty-state">BELUM DIMULAI</div>
-          <div class="warranty-dates">
-            GARANSI MULAI DIHITUNG SAAT PERANGKAT DIAMBIL / DISERAHKAN.
-            ${extra>0?`<br>BONUS PROMO: +${extra} HARI`:''}
-          </div>`;
-        return;
-      }
-
-      const start = new Date(startRaw);
-      const end = new Date(start);
-      end.setDate(end.getDate()+total);
-      const active = new Date() <= end;
-
+      const label = String(o.warranty_label || 'TANPA GARANSI').trim().toUpperCase();
+      const endRaw = o.warranty_until || null;
+      const active = endRaw ? new Date() <= new Date(endRaw) : false;
       box.innerHTML = `
         <div class="small muted">GARANSI SERVICE</div>
-        <div class="warranty-big">${total} HARI</div>
-        <div class="warranty-state">${active?'GARANSI AKTIF':'GARANSI SELESAI'}</div>
-        <div class="warranty-dates">
-          TANGGAL GARANSI: ${fmtDateOnly(start)}<br>
-          BERAKHIR: ${fmtDateOnly(end)}
-          ${extra>0?`<br>BONUS PROMO: +${extra} HARI`:''}
-        </div>`;
+        <div class="warranty-big">${esc(label || 'TANPA GARANSI')}</div>
+        <div class="warranty-state">${endRaw ? (active?'GARANSI AKTIF':'GARANSI SELESAI') : 'MENGIKUTI DATA SERVICE'}</div>
+        <div class="warranty-dates">${endRaw ? `BERAKHIR: ${fmtDateOnly(endRaw)}` : 'TANGGAL GARANSI BELUM DITETAPKAN.'}</div>`;
     }
 
     function renderSummary(o){
-      const customer = o.members?.name || o.customer_name || o.member_name || '—';
-      const device = [o.device_brand,o.device_model].filter(Boolean).join(' ') || o.device_type || '—';
+      const customer = o.customer_name || '—';
+      const device = o.device_name || o.device_type || '—';
       $('summaryGrid').innerHTML = `
-        <div class="info"><div class="k">NO. INVOICE</div><div class="v">${esc(upperText(o.ticket_number))}</div></div>
+        <div class="info"><div class="k">NO. INVOICE</div><div class="v">${esc(upperText(o.ticket))}</div></div>
         <div class="info"><div class="k">PELANGGAN</div><div class="v">${esc(upperText(customer))}</div></div>
         <div class="info"><div class="k">PERANGKAT</div><div class="v">${esc(upperText(device))}</div></div>
         <div class="info"><div class="k">IMEI / SERIAL</div><div class="v">${esc(upperText(maskImei(o.imei || o.imei1 || o.serial_number)))}</div></div>
         <div class="info full"><div class="k">KELUHAN / KERUSAKAN</div><div class="v">${esc(upperText(o.complaint || '—'))}</div></div>
-        <div class="info full"><div class="k">TINDAKAN / HASIL SERVICE</div><div class="v">${esc(upperText(o.repair_summary || o.repair_action || 'BELUM ADA RINGKASAN TINDAKAN.'))}</div></div>
+        <div class="info full"><div class="k">TINDAKAN / HASIL SERVICE</div><div class="v">${esc(upperText(o.final_result || 'BELUM ADA RINGKASAN TINDAKAN.'))}</div></div>
       `;
     }
 
     function renderDates(o){
-      const completed = o.final_completed_at || o.completed_at || null;
-      const picked = o.picked_up_at || o.final_receipt_printed_at || null;
-      const totalWarranty = Math.max(0, Number(o.warranty_days||0) + Number(o.promo_warranty_extra_days||0));
-      let warrantyEnd = null;
-      if(picked && totalWarranty > 0){
-        warrantyEnd = new Date(picked);
-        warrantyEnd.setDate(warrantyEnd.getDate()+totalWarranty);
-      }
-
+      const completed = o.finished_at || null;
+      const picked = o.picked_up_at || null;
       $('dateGrid').innerHTML = `
-        <div class="date-card"><div class="date-label">TANGGAL MASUK</div><div class="date-value">${fmtDate(o.created_at)}</div></div>
+        <div class="date-card"><div class="date-label">TANGGAL MASUK</div><div class="date-value">${fmtDate(o.received_at || o.created_at)}</div></div>
         <div class="date-card"><div class="date-label">TANGGAL SELESAI</div><div class="date-value">${fmtDate(completed)}</div></div>
         <div class="date-card"><div class="date-label">TANGGAL DIAMBIL</div><div class="date-value">${fmtDate(picked)}</div></div>
-        <div class="date-card"><div class="date-label">TANGGAL GARANSI</div><div class="date-value">${
-          picked && totalWarranty > 0
-            ? `${fmtDateOnly(picked)} — ${fmtDateOnly(warrantyEnd)}`
-            : '—'
-        }</div></div>
-      `;
+        <div class="date-card"><div class="date-label">GARANSI BERAKHIR</div><div class="date-value">${fmtDateOnly(o.warranty_until)}</div></div>`;
     }
 
     function extractParts(o){
       const raw =
+        o.parts_public ??
         o.replaced_components ??
         o.components_replaced ??
         o.parts_replaced ??
@@ -857,20 +814,10 @@
     }
 
     async function fetchTracking(ticket){
-      // Gunakan * agar field komponen baru dari aplikasi otomatis ikut terbaca.
-      // Relasi members dicoba terlebih dahulu, lalu fallback tanpa relasi.
-      let r = await sb.from('service_orders')
-        .select('*,members(name)')
-        .eq('ticket_number',ticket)
+      return await sb.from('rk2_tracking_public_v1')
+        .select('*')
+        .eq('ticket',ticket)
         .maybeSingle();
-
-      if(r.error){
-        r = await sb.from('service_orders')
-          .select('*')
-          .eq('ticket_number',ticket)
-          .maybeSingle();
-      }
-      return r;
     }
 
     async function loadTracking(){
@@ -903,8 +850,8 @@
       renderDates(data);
       renderParts(data);
       renderProgress(data.status);
-      renderQcCard('qcInitialCard','QC AWAL',data.initial_checklist);
-      renderQcCard('qcFinalCard','QC AKHIR',data.final_checklist);
+      renderQcCard('qcInitialCard','QC AWAL',data.qc_initial || data.initial_checklist);
+      renderQcCard('qcFinalCard','QC AKHIR',data.qc_final || data.final_checklist);
       renderWarranty(data);
 
       if(data.customer_rating){
@@ -960,14 +907,9 @@
       });
 
       if(rpc.error){
-        const up = await sb.from('service_orders')
-          .update({customer_rating:selectedRating,customer_testimonial:txt})
-          .eq('ticket_number',currentTicket);
-        if(up.error){
-          console.error(rpc.error,up.error);
-          $('testimonialMsg').textContent='Testimoni belum dapat dikirim. Hubungi admin RK CELL.';
-          return;
-        }
+        console.error(rpc.error);
+        $('testimonialMsg').textContent='Fitur testimoni server belum diaktifkan. Hubungi admin RK CELL.';
+        return;
       }
       $('testimonialMsg').textContent='Terima kasih. Testimoni Anda sudah tersimpan.';
       $('testimonialSaved').textContent=`Testimoni tersimpan: "${txt}"`;
@@ -984,7 +926,7 @@
 
       if(!rows.length){
         try{
-          const r = await sb.from('rewards').select('*').eq('active',true);
+          const r = await sb.from('promos').select('*').eq('is_active',true);
           if(!r.error && Array.isArray(r.data)) rows = r.data;
         }catch(e){}
       }
@@ -998,7 +940,7 @@
       rows = rows.filter(x=>{
         const type = String(x.type || x.reward_type || '').toLowerCase();
         if(type && type !== 'promo') return false;
-        if(x.active === false) return false;
+        if(x.active === false || x.is_active === false) return false;
         const start = x.start_at || x.start_date;
         const end = x.end_at || x.end_date;
         if(start && new Date(start) > now) return false;
