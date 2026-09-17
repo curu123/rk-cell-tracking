@@ -526,7 +526,7 @@
             <button class="star" data-v="4">★</button>
             <button class="star" data-v="5">★</button>
           </div>
-          <div id="testimonialReason" style="padding:12px 14px;border-radius:14px;background:#07182a;border:1px solid var(--line);font-size:12px;font-weight:900;color:#dff5ff">PILIH BINTANG UNTUK MEMBERIKAN PENILAIAN</div>
+          <div id="testimonialReason" style="padding:16px;border-radius:16px;background:linear-gradient(145deg,rgba(39,182,255,.10),rgba(255,154,47,.07));border:1px solid rgba(39,182,255,.20)"><div id="testimonialTitle" style="font-size:14px;font-weight:950;color:#fff">PILIH BINTANG PENILAIAN</div><div id="testimonialDesc" style="margin-top:6px;font-size:11px;line-height:1.55;color:#9fb4c9">Sentuh bintang sesuai pengalaman pelayanan Anda di RK CELL.</div></div>
           <textarea id="testimonialText" style="display:none"></textarea>
           <div class="cta">
             <button class="btn btn-primary" onclick="submitTestimonial()">Kirim Testimoni</button>
@@ -859,13 +859,11 @@
         selectedRating = Number(data.customer_rating);
         refreshStars();
       }
-      if(data.customer_testimonial){
-        $('testimonialSaved').textContent = `Testimoni tersimpan: "${data.customer_testimonial}"`;
-        $('testimonialText').value = data.customer_testimonial;
-        $('testimonialReason').textContent = data.customer_testimonial;
+      if(data.customer_testimonial || data.customer_rating){
+        $('testimonialSaved').textContent = '✓ PENILAIAN ANDA SUDAH TERSIMPAN';
+        applyTestimonialReason();
       } else {
         $('testimonialSaved').textContent = '';
-        $('testimonialText').value = '';
         applyTestimonialReason();
       }
 
@@ -876,17 +874,25 @@
     }
 
     const testimonialReasons = {
-      1:'SANGAT KURANG',
-      2:'KURANG',
-      3:'CUKUP',
-      4:'SANGAT BAIK',
-      5:'SEMPURNA'
+      1:{title:'PERLU BANYAK PERBAIKAN',desc:'Pelayanan belum memenuhi harapan saya dan masih memerlukan banyak perbaikan.'},
+      2:{title:'MASIH PERLU DITINGKATKAN',desc:'Pelayanan sudah berjalan, tetapi masih ada beberapa bagian yang perlu ditingkatkan.'},
+      3:{title:'CUKUP MEMUASKAN',desc:'Pelayanan cukup baik dan kebutuhan saya terpenuhi, meskipun masih dapat ditingkatkan.'},
+      4:{title:'SANGAT MEMUASKAN',desc:'Pelayanan sangat baik, prosesnya jelas, dan hasilnya sesuai dengan harapan saya.'},
+      5:{title:'LUAR BIASA • SEMPURNA',desc:'Saya sangat puas. Pelayanan RK CELL jelas, nyaman, dan hasil service sesuai harapan saya.'}
     };
 
     function applyTestimonialReason(){
-      const reason = testimonialReasons[selectedRating] || '';
-      $('testimonialText').value = reason;
-      $('testimonialReason').textContent = reason || 'PILIH BINTANG UNTUK MEMBERIKAN PENILAIAN';
+      const item = testimonialReasons[selectedRating];
+      if(!item){
+        $('testimonialText').value='';
+        $('testimonialTitle').textContent='PILIH BINTANG PENILAIAN';
+        $('testimonialDesc').textContent='Sentuh bintang sesuai pengalaman pelayanan Anda di RK CELL.';
+        return;
+      }
+      const saved = `${item.title} — ${item.desc}`;
+      $('testimonialText').value=saved;
+      $('testimonialTitle').textContent=item.title;
+      $('testimonialDesc').textContent=item.desc;
     }
 
     function refreshStars(){
@@ -930,7 +936,7 @@
         return;
       }
       $('testimonialMsg').textContent='Terima kasih. Testimoni Anda sudah tersimpan.';
-      $('testimonialSaved').textContent=`Testimoni tersimpan: "${txt}"`;
+      $('testimonialSaved').textContent='✓ PENILAIAN ANDA SUDAH TERSIMPAN';
     }
 
     async function loadPromos(){
