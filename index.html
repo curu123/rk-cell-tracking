@@ -526,7 +526,8 @@
             <button class="star" data-v="4">★</button>
             <button class="star" data-v="5">★</button>
           </div>
-          <textarea id="testimonialText" maxlength="500" placeholder="Ceritakan pengalaman service Anda di RK CELL..."></textarea>
+          <div id="testimonialReason" style="padding:12px 14px;border-radius:14px;background:#07182a;border:1px solid var(--line);font-size:12px;font-weight:900;color:#dff5ff">PILIH BINTANG UNTUK MEMBERIKAN PENILAIAN</div>
+          <textarea id="testimonialText" style="display:none"></textarea>
           <div class="cta">
             <button class="btn btn-primary" onclick="submitTestimonial()">Kirim Testimoni</button>
           </div>
@@ -861,15 +862,31 @@
       if(data.customer_testimonial){
         $('testimonialSaved').textContent = `Testimoni tersimpan: "${data.customer_testimonial}"`;
         $('testimonialText').value = data.customer_testimonial;
+        $('testimonialReason').textContent = data.customer_testimonial;
       } else {
         $('testimonialSaved').textContent = '';
         $('testimonialText').value = '';
+        applyTestimonialReason();
       }
 
       $('serviceShell').classList.add('active');
       $('statusMsg').textContent = `Tracking ditemukan • terakhir diperbarui ${fmtDate(data.updated_at || data.created_at)}`;
       history.replaceState(null,'',`?t=${encodeURIComponent(ticket)}`);
       setTimeout(()=>$('serviceShell').scrollIntoView({behavior:'smooth',block:'start'}),100);
+    }
+
+    const testimonialReasons = {
+      1:'SANGAT KURANG',
+      2:'KURANG',
+      3:'CUKUP',
+      4:'SANGAT BAIK',
+      5:'SEMPURNA'
+    };
+
+    function applyTestimonialReason(){
+      const reason = testimonialReasons[selectedRating] || '';
+      $('testimonialText').value = reason;
+      $('testimonialReason').textContent = reason || 'PILIH BINTANG UNTUK MEMBERIKAN PENILAIAN';
     }
 
     function refreshStars(){
@@ -881,6 +898,7 @@
       s.addEventListener('click',()=>{
         selectedRating=Number(s.dataset.v);
         refreshStars();
+        applyTestimonialReason();
       });
     });
 
