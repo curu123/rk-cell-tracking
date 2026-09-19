@@ -387,6 +387,29 @@
       .date-grid{grid-template-columns:1fr}
     }
 
+
+    /* === PEMBAYARAN ADMIN === */
+    .payment-box{
+      padding:18px;border-radius:18px;
+      background:linear-gradient(145deg,rgba(39,182,255,.09),rgba(10,29,50,.96));
+      border:1px solid rgba(39,182,255,.24);
+    }
+    .payment-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .payment-item{padding:13px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+    .payment-item .k{font-size:9px;color:var(--muted);font-weight:850;letter-spacing:.55px}
+    .payment-item .v{font-size:16px;font-weight:950;margin-top:6px}
+    .payment-lunas{
+      margin-top:12px;padding:13px;border-radius:14px;text-align:center;
+      color:#aaf3bf;background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.25);
+      font-size:16px;font-weight:1000;letter-spacing:.4px
+    }
+    .payment-sisa{
+      margin-top:12px;padding:13px;border-radius:14px;text-align:center;
+      color:#ffd481;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.25);
+      font-size:13px;font-weight:950
+    }
+    @media(max-width:560px){.payment-grid{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
@@ -466,6 +489,18 @@
             <div id="statusBadge" class="badge status-progress">MEMUAT</div>
           </div>
           <div id="summaryGrid" class="summary"></div>
+        </section>
+
+        <section class="card" id="paymentCard">
+          <div class="section-head">
+            <div>
+              <h2>PEMBAYARAN</h2>
+              <p>Informasi pembayaran yang tercatat oleh Admin RK CELL</p>
+            </div>
+          </div>
+          <div id="paymentBox" class="payment-box">
+            <div class="small muted">MEMUAT DATA PEMBAYARAN...</div>
+          </div>
         </section>
 
         <section class="card">
@@ -765,6 +800,43 @@
       `;
     }
 
+    const fmtRupiah = value => {
+      const n = Number(value || 0);
+      return 'Rp' + new Intl.NumberFormat('id-ID').format(Number.isFinite(n) ? n : 0);
+    };
+
+    function renderPayment(o){
+      const box = $('paymentBox');
+      const total = Math.max(0, Number(o.service_cost || 0));
+      const paid = Math.max(0, Number(o.down_payment || 0));
+      const remaining = Math.max(0, Number(
+        o.remaining_payment !== undefined && o.remaining_payment !== null
+          ? o.remaining_payment
+          : total - paid
+      ));
+      const lunas = total > 0 && paid >= total;
+
+      box.innerHTML = `
+        <div class="payment-grid">
+          <div class="payment-item">
+            <div class="k">TOTAL SERVICE</div>
+            <div class="v">${esc(fmtRupiah(total))}</div>
+          </div>
+          <div class="payment-item">
+            <div class="k">SUDAH DIBAYAR / DP</div>
+            <div class="v">${esc(fmtRupiah(paid))}</div>
+          </div>
+          <div class="payment-item">
+            <div class="k">SISA PEMBAYARAN</div>
+            <div class="v">${esc(fmtRupiah(remaining))}</div>
+          </div>
+        </div>
+        ${lunas
+          ? '<div class="payment-lunas">✓ LUNAS • TIDAK ADA SISA PEMBAYARAN</div>'
+          : `<div class="payment-sisa">SISA YANG HARUS DIBAYAR: ${esc(fmtRupiah(remaining))}</div>`
+        }`;
+    }
+
     function renderDates(o){
       const completed = o.finished_at || null;
       const picked = o.picked_up_at || null;
@@ -848,6 +920,7 @@
       $('statusBadge').textContent = label;
 
       renderSummary(data);
+      renderPayment(data);
       renderDates(data);
       renderParts(data);
       renderProgress(data.status);
