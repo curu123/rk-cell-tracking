@@ -425,6 +425,17 @@
     .photo-close{position:absolute;right:18px;top:18px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:24px;cursor:pointer}
     @media(max-width:560px){.qc-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+    /* === GALERI FOTO SERVICE KHUSUS === */
+    .service-photo-groups{display:grid;gap:14px}
+    .service-photo-group{padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+    .service-photo-group h4{margin:0 0 5px;font-size:12px}
+    .service-photo-group p{margin:0 0 11px;color:var(--muted);font-size:10px}
+    .service-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+    .service-photo-item{border:0;padding:0;background:#07182a;border-radius:13px;overflow:hidden;cursor:pointer;border:1px solid var(--line);text-align:left}
+    .service-photo-item img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+    .service-photo-caption{padding:8px;color:#dcecff;font-size:9px;font-weight:800;line-height:1.3}
+    @media(max-width:560px){.service-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   </style>
 </head>
 <body>
@@ -558,6 +569,18 @@
           <div class="qc-grid">
             <div id="qcInitialCard" class="qc-card" onclick="toggleQc('qcInitialCard')"></div>
             <div id="qcFinalCard" class="qc-card" onclick="toggleQc('qcFinalCard')"></div>
+          </div>
+        </section>
+
+        <section class="card" id="servicePhotosCard">
+          <div class="section-head">
+            <div>
+              <h2>FOTO SERVICE</h2>
+              <p>Dokumentasi kondisi masuk dan pemeriksaan teknisi</p>
+            </div>
+          </div>
+          <div id="servicePhotoGroups" class="service-photo-groups">
+            <div class="empty">BELUM ADA FOTO SERVICE.</div>
           </div>
         </section>
 
@@ -808,6 +831,35 @@
       return urls;
     }
 
+    async function signedServicePhotos(data){
+      const rows=Array.isArray(data.qc_photos)?data.qc_photos:(Array.isArray(data.service_photos)?data.service_photos:[]);
+      const out=[];
+      for(const r of rows){
+        const path=String(r?.storage_path||'').trim();
+        if(!path) continue;
+        try{
+          const {data:signed,error}=await sb.storage.from('service-photos').createSignedUrl(path,3600);
+          if(!error && signed?.signedUrl) out.push({...r,url:signed.signedUrl});
+        }catch(e){}
+      }
+      return out;
+    }
+
+    function renderServicePhotos(rows){
+      const root=$('servicePhotoGroups');
+      const defs=[
+        ['ADMIN','FOTO KONDISI MASUK','Foto yang dimasukkan Admin saat penerimaan perangkat',['admin_front','admin_back']],
+        ['QC AWAL','FOTO QC AWAL','Dokumentasi pemeriksaan sebelum pengerjaan',['qc_awal_front','qc_awal_back']],
+        ['QC AKHIR','FOTO QC AKHIR','Dokumentasi pemeriksaan setelah pengerjaan',['qc_akhir_front','qc_akhir_back']],
+      ];
+      const groups=defs.map(([key,title,desc,kinds])=>{
+        const items=rows.filter(x=>kinds.includes(String(x.kind||'')));
+        if(!items.length) return '';
+        return `<div class="service-photo-group"><h4>${title}</h4><p>${desc}</p><div class="service-photo-grid">${items.map((x,i)=>`<button class="service-photo-item" type="button" onclick="openQcPhoto('${esc(x.url)}')"><img src="${esc(x.url)}" loading="lazy" alt="${title} ${i+1}"><div class="service-photo-caption">${esc(upperText(x.caption||String(x.kind||'FOTO').replaceAll('_',' ')))}</div></button>`).join('')}</div></div>`;
+      }).filter(Boolean);
+      root.innerHTML=groups.length?groups.join(''):'<div class="empty">BELUM ADA FOTO SERVICE.</div>';
+    }
+
     function openQcPhoto(url){ $('photoModalImg').src=url; $('photoModal').classList.add('open'); }
     function closeQcPhoto(){ $('photoModal').classList.remove('open'); $('photoModalImg').src=''; }
 
@@ -824,7 +876,7 @@
         .some(x=>s.includes(x));
     }
 
-    function renderQcCard(target,title,data,photos=[]){
+    function renderQcCard(target,title,data){
       const rows=flattenQc(data);
       const problems=rows.filter(x=>qcHasProblem(x.status));
       let badgeClass='empty', badgeText='BELUM ADA DATA', hint='KLIK UNTUK MELIHAT DETAIL';
@@ -837,8 +889,7 @@
       const details=rows.length?Object.entries(groups).map(([g,items])=>`
         <div class="qc-group"><div class="qc-group-title">${esc(upperText(g))}</div>${items.map(x=>`
           <div class="qc-row"><span>${esc(upperText(x.name))}</span><span class="${qcClass(x.status)}">${esc(upperText(x.status||'—'))}</span></div>`).join('')}</div>`).join(''):'<div class="small muted">BELUM ADA DATA QC.</div>';
-      const photoHtml=photos.length?`<div class="qc-photo-section"><div class="qc-photo-title">FOTO PEMERIKSAAN • ${photos.length} FOTO</div><div class="qc-photo-grid">${photos.map((u,i)=>`<button class="qc-photo" type="button" onclick="event.stopPropagation();openQcPhoto('${esc(u)}')"><img src="${esc(u)}" loading="lazy" alt="${title} foto ${i+1}" onerror="this.closest('.qc-photo').style.display='none'"></button>`).join('')}</div></div>`:'';
-      $(target).innerHTML=`<div class="qc-summary-head"><h4 style="margin:0">${title}</h4><span class="qc-state ${badgeClass}">${badgeText}</span></div><div class="qc-hint">${hint}</div><div class="qc-details">${details}${photoHtml}</div>`;
+      $(target).innerHTML=`<div class="qc-summary-head"><h4 style="margin:0">${title}</h4><span class="qc-state ${badgeClass}">${badgeText}</span></div><div class="qc-hint">${hint}</div><div class="qc-details">${details}</div>`;
     }
 
     function renderWarranty(o){
@@ -990,10 +1041,10 @@
       renderDates(data);
       renderParts(data);
       renderProgress(data.status,data);
-      const qcInitialPhotos=[...collectPhotoUrls(data.qc_initial_photos,data.initial_photos,data.photos_before,data.photo_front,data.photo_back,data.photo_damage,data.qc_initial,data.initial_checklist),...(await signedQcPhotos(data,'qc_awal_'))];
-      const qcFinalPhotos=[...collectPhotoUrls(data.qc_final_photos,data.final_photos,data.photos_after,data.photo_after_repair,data.after_repair,data.qc_final,data.final_checklist),...(await signedQcPhotos(data,'qc_akhir_'))];
-      renderQcCard('qcInitialCard','QC AWAL',data.qc_initial || data.initial_checklist,qcInitialPhotos);
-      renderQcCard('qcFinalCard','QC AKHIR',data.qc_final || data.final_checklist,qcFinalPhotos);
+      renderQcCard('qcInitialCard','QC AWAL',data.qc_initial || data.initial_checklist);
+      renderQcCard('qcFinalCard','QC AKHIR',data.qc_final || data.final_checklist);
+      const allServicePhotos=await signedServicePhotos(data);
+      renderServicePhotos(allServicePhotos);
       renderWarranty(data);
 
       if(data.customer_rating){
