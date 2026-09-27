@@ -743,7 +743,9 @@
         if(Array.isArray(node)){
           node.forEach((x,i)=>{
             if(typeof x==='string') out.push({group:path.join(' / '),name:x,status:'NORMAL'});
-            else if(x && typeof x==='object' && (x.name||x.label||x.item||x.title)){
+            else if(x && typeof x==='object' && Array.isArray(x.items)){
+              walk(x.items,[...path,String(x.title||x.name||x.label||`KATEGORI ${i+1}`)]);
+            }else if(x && typeof x==='object' && (x.name||x.label||x.item||x.title)){
               out.push({group:path.join(' / '),name:x.name||x.label||x.item||x.title||`Item ${i+1}`,status:x.status||x.result||x.value||x.state||''});
             }else walk(x,path);
           });
@@ -788,6 +790,22 @@
       };
       sources.forEach(x=>walk(x));
       return urls.slice(0,12);
+    }
+
+
+    async function signedQcPhotos(data, prefix){
+      const rows=Array.isArray(data.qc_photos)?data.qc_photos:[];
+      const selected=rows.filter(x=>String(x?.kind||'').startsWith(prefix));
+      const urls=[];
+      for(const x of selected){
+        const path=String(x?.storage_path||'').trim();
+        if(!path) continue;
+        try{
+          const {data:signed,error}=await sb.storage.from('service-photos').createSignedUrl(path,3600);
+          if(!error && signed?.signedUrl) urls.push(signed.signedUrl);
+        }catch(_){ }
+      }
+      return urls;
     }
 
     function openQcPhoto(url){ $('photoModalImg').src=url; $('photoModal').classList.add('open'); }
@@ -972,8 +990,8 @@
       renderDates(data);
       renderParts(data);
       renderProgress(data.status,data);
-      const qcInitialPhotos=collectPhotoUrls(data.qc_initial_photos,data.initial_photos,data.photos_before,data.photo_front,data.photo_back,data.photo_damage,data.qc_initial,data.initial_checklist);
-      const qcFinalPhotos=collectPhotoUrls(data.qc_final_photos,data.final_photos,data.photos_after,data.photo_after_repair,data.after_repair,data.qc_final,data.final_checklist);
+      const qcInitialPhotos=[...collectPhotoUrls(data.qc_initial_photos,data.initial_photos,data.photos_before,data.photo_front,data.photo_back,data.photo_damage,data.qc_initial,data.initial_checklist),...(await signedQcPhotos(data,'qc_awal_'))];
+      const qcFinalPhotos=[...collectPhotoUrls(data.qc_final_photos,data.final_photos,data.photos_after,data.photo_after_repair,data.after_repair,data.qc_final,data.final_checklist),...(await signedQcPhotos(data,'qc_akhir_'))];
       renderQcCard('qcInitialCard','QC AWAL',data.qc_initial || data.initial_checklist,qcInitialPhotos);
       renderQcCard('qcFinalCard','QC AKHIR',data.qc_final || data.final_checklist,qcFinalPhotos);
       renderWarranty(data);
