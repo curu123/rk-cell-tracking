@@ -501,6 +501,77 @@
       min-height:52px;
     }
 
+  
+    /* === DATA COLOR HIERARCHY V2.6 === */
+    /* Nilai data dibuat tebal dan dibedakan warnanya agar cepat dibaca */
+    #summaryGrid .info .v,
+    #dateGrid .date-value{
+      font-weight:1000 !important;
+    }
+
+    /* Nama pelanggan: biru terang */
+    #summaryGrid .customer-focus .v{
+      color:#63d3ff !important;
+    }
+
+    /* Kerusakan: merah tegas */
+    #summaryGrid .damage-focus .v{
+      color:#ff525d !important;
+      font-weight:1000 !important;
+    }
+
+    /* Perangkat: kuning */
+    #summaryGrid .info:nth-child(3) .v{
+      color:#ffd166 !important;
+    }
+
+    /* Invoice: cyan */
+    #summaryGrid .info:nth-child(4) .v{
+      color:#72e3ff !important;
+    }
+
+    /* Tindakan/hasil service: hijau */
+    #summaryGrid .info:nth-child(5) .v{
+      color:#69e78f !important;
+    }
+
+    /* Tanggal masuk: biru */
+    #dateGrid .date-card:nth-child(1) .date-value{
+      color:#62cfff !important;
+    }
+
+    /* Tanggal selesai: hijau */
+    #dateGrid .date-card:nth-child(2) .date-value{
+      color:#69e78f !important;
+    }
+
+    /* Tanggal diambil: kuning */
+    #dateGrid .date-card:nth-child(3) .date-value{
+      color:#ffd166 !important;
+    }
+
+    /* Garansi berakhir: merah dan paling tebal */
+    #dateGrid .date-card:nth-child(4){
+      border-color:rgba(239,68,68,.34) !important;
+      background:rgba(239,68,68,.07) !important;
+    }
+    #dateGrid .date-card:nth-child(4) .date-label{
+      color:#ff9ca2 !important;
+      font-weight:900 !important;
+    }
+    #dateGrid .date-card:nth-child(4) .date-value{
+      color:#ff525d !important;
+      font-weight:1000 !important;
+      font-size:16px !important;
+    }
+
+    /* Status sudah diambil: hijau agar tidak bertabrakan dengan merah kerusakan/garansi */
+    #statusBadge.status-done{
+      color:#aaf3bf !important;
+      background:rgba(34,197,94,.12) !important;
+      border-color:rgba(34,197,94,.28) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -1220,7 +1291,27 @@
 
     function openTestimonialPopup(){
       if(!currentTicket || !currentOrder) return;
+
+      // Jangan tampilkan lagi jika pelanggan sudah pernah memberi penilaian.
       if(currentOrder.customer_rating || currentOrder.customer_testimonial) return;
+
+      // Testimoni hanya ditawarkan setelah service selesai / HP sudah diambil.
+      // Tracking pada tahap MASUK, DIAGNOSA, PROSES, QC, dll tidak diganggu popup.
+      const s = normStatus(currentOrder.status);
+      const eligible = [
+        'completed',
+        'selesai',
+        'selesai - siap diambil',
+        'selesai_siap_diambil',
+        'picked_up',
+        'diambil',
+        'picked',
+        'sudah diambil',
+        'sudah_diambil'
+      ].includes(s);
+
+      if(!eligible) return;
+
       const pop=$('testimonialPopup');
       if(!pop) return;
       refreshPopupStars();
@@ -1245,6 +1336,10 @@
       await submitTestimonial();
       $('popupTestimonialMsg').textContent=$('testimonialMsg').textContent;
       if(String($('testimonialMsg').textContent).toLowerCase().includes('tersimpan')){
+        if(currentOrder){
+          currentOrder.customer_rating = selectedRating;
+          currentOrder.customer_testimonial = $('testimonialText').value.trim();
+        }
         closeTestimonialPopup();
       }
     }
