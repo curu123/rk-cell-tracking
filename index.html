@@ -706,28 +706,7 @@
                   <div id="dateGrid" class="date-grid"></div>
                 </section>
 
-        <section class="card">
-                  <div class="section-head">
-                    <div>
-                      <h2>Testimoni Pelanggan</h2>
-                      <p>Bantu RK CELL terus meningkatkan pelayanan</p>
-                    </div>
-                  </div>
-                  <div id="testimonialSaved" class="small muted" style="margin-bottom:10px"></div>
-                  <div class="rating" id="ratingStars">
-                    <button class="star" data-v="1">★</button>
-                    <button class="star" data-v="2">★</button>
-                    <button class="star" data-v="3">★</button>
-                    <button class="star" data-v="4">★</button>
-                    <button class="star" data-v="5">★</button>
-                  </div>
-                  <div id="testimonialReason" style="padding:16px;border-radius:16px;background:linear-gradient(145deg,rgba(39,182,255,.10),rgba(255,154,47,.07));border:1px solid rgba(39,182,255,.20)"><div id="testimonialTitle" style="font-size:14px;font-weight:950;color:#fff">PILIH BINTANG PENILAIAN</div><div id="testimonialDesc" style="margin-top:6px;font-size:11px;line-height:1.55;color:#9fb4c9">Sentuh bintang sesuai pengalaman pelayanan Anda di RK CELL.</div></div>
-                  <textarea id="testimonialText" style="display:none"></textarea>
-                  <div class="cta">
-                    <button class="btn btn-primary" onclick="submitTestimonial()">Kirim Testimoni</button>
-                  </div>
-                  <div id="testimonialMsg" class="status-msg"></div>
-                </section>
+        
       </div>
 
       <aside class="stack">
@@ -782,6 +761,16 @@
     <img id="photoModalImg" alt="Foto pemeriksaan QC" onclick="event.stopPropagation()">
   </div>
 
+
+  
+  <div id="testimonialCompat" style="display:none!important">
+    <div id="testimonialSaved"></div>
+    <div id="ratingStars"></div>
+    <div id="testimonialTitle"></div>
+    <div id="testimonialDesc"></div>
+    <textarea id="testimonialText"></textarea>
+    <div id="testimonialMsg"></div>
+  </div>
 
   <div id="testimonialPopup" class="testimonial-popup" aria-hidden="true">
     <div class="testimonial-popup-box">
