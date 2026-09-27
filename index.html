@@ -683,17 +683,6 @@
       </div>
 
       <aside class="stack">
-        <section class="card sell-card">
-          <div class="eyebrow">NILAI LAYANAN RK CELL</div>
-          <div class="lead" style="margin-top:13px">Bukan sekadar <span>memperbaiki HP.</span><br>Kami membuat prosesnya lebih jelas.</div>
-          <div class="sell-points">
-            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Transparan</b><br><span class="muted">Status dan tahapan service dapat dipantau.</span></div></div>
-            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Terukur</b><br><span class="muted">QC membantu membandingkan kondisi sebelum dan sesudah.</span></div></div>
-            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Lebih Aman</b><br><span class="muted">Garansi dan histori service tersimpan berdasarkan invoice.</span></div></div>
-            <div class="sell-point"><div class="sell-icon">✓</div><div><b>Lebih Mudah</b><br><span class="muted">Satu QR untuk memantau perkembangan service.</span></div></div>
-          </div>
-        </section>
-
         <section class="card">
           <div class="section-head">
             <div><h2>GARANSI SERVICE</h2><p>Informasi garansi sesuai pekerjaan</p></div>
@@ -999,12 +988,27 @@
       const box = $('warrantyBox');
       const label = String(o.warranty_label || 'TANPA GARANSI').trim().toUpperCase();
       const endRaw = o.warranty_until || null;
-      const active = endRaw ? new Date() <= new Date(endRaw) : false;
+      if(!endRaw){
+        box.innerHTML = `
+          <div class="small muted">GARANSI SERVICE</div>
+          <div class="warranty-big">${esc(label || 'TANPA GARANSI')}</div>
+          <div class="warranty-state">TANGGAL GARANSI BELUM DITETAPKAN</div>`;
+        return;
+      }
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const end = new Date(endRaw);
+      end.setHours(23,59,59,999);
+      const diffDays = Math.max(0, Math.ceil((end-now)/86400000));
+      const active = end >= now;
+      const countdown = active
+        ? (diffDays === 0 ? 'BERAKHIR HARI INI' : `${diffDays} HARI LAGI`)
+        : 'GARANSI TELAH BERAKHIR';
       box.innerHTML = `
         <div class="small muted">GARANSI SERVICE</div>
-        <div class="warranty-big">${esc(label || 'TANPA GARANSI')}</div>
-        <div class="warranty-state">${endRaw ? (active?'GARANSI AKTIF':'GARANSI SELESAI') : 'MENGIKUTI DATA SERVICE'}</div>
-        <div class="warranty-dates">${endRaw ? `BERAKHIR: ${fmtDateOnly(endRaw)}` : 'TANGGAL GARANSI BELUM DITETAPKAN.'}</div>`;
+        <div class="warranty-big">${esc(countdown)}</div>
+        <div class="warranty-state">${active ? 'GARANSI AKTIF' : 'GARANSI SELESAI'}</div>
+        <div class="warranty-dates">${esc(label)} • ${active ? `SAMPAI ${fmtDateOnly(endRaw)}` : `BERAKHIR ${fmtDateOnly(endRaw)}`}</div>`;
     }
 
     function renderSummary(o){
@@ -1140,7 +1144,6 @@
 
       renderSummary(data);
       renderPayment(data);
-      renderDates(data);
       renderParts(data);
       renderProgress(data.status,data);
       renderQcCard('qcInitialCard','QC AWAL',data.qc_initial || data.initial_checklist);
@@ -1233,6 +1236,11 @@
       }
       $('testimonialMsg').textContent='Terima kasih. Testimoni Anda sudah tersimpan.';
       $('testimonialSaved').textContent='✓ PENILAIAN ANDA SUDAH TERSIMPAN';
+      try{ localStorage.setItem(`rk_testimonial_${currentTicket}`,'1'); }catch(e){}
+      if(currentOrder){
+        currentOrder.customer_rating = selectedRating;
+        currentOrder.customer_testimonial = txt;
+      }
     }
 
 
@@ -1251,11 +1259,24 @@
       }
     }
 
-    function openTestimonialPopup(){
+    async function hasSavedTestimonial(){
+      if(!currentTicket) return false;
+      if(currentOrder && (currentOrder.customer_rating || currentOrder.customer_testimonial)) return true;
+      try{
+        if(localStorage.getItem(`rk_testimonial_${currentTicket}`)==='1') return true;
+      }catch(e){}
+      try{
+        const r = await sb.rpc('rk2_has_service_testimonial_v1',{p_ticket:currentTicket});
+        if(!r.error && r.data === true) return true;
+      }catch(e){}
+      return false;
+    }
+
+    async function openTestimonialPopup(){
       if(!currentTicket || !currentOrder) return;
 
-      // Jangan tampilkan lagi jika pelanggan sudah pernah memberi penilaian.
-      if(currentOrder.customer_rating || currentOrder.customer_testimonial) return;
+      // Cek database + data tracking + cache perangkat. Jangan minta testimoni dua kali.
+      if(await hasSavedTestimonial()) return;
 
       // Testimoni hanya ditawarkan setelah service selesai / HP sudah diambil.
       // Tracking pada tahap MASUK, DIAGNOSA, PROSES, QC, dll tidak diganggu popup.
