@@ -436,6 +436,71 @@
     .service-photo-item img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
     .service-photo-caption{padding:8px;color:#dcecff;font-size:9px;font-weight:800;line-height:1.3}
     @media(max-width:560px){.service-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  
+    /* === TRACKING FOCUS V2.3 === */
+    .tracking-focus{padding:18px 19px}
+    .tracking-focus .k{font-size:11px;font-weight:900;letter-spacing:.85px}
+    .customer-focus{background:rgba(39,182,255,.07);border-color:rgba(39,182,255,.24)}
+    .customer-focus .v{font-size:clamp(20px,3.5vw,28px);font-weight:1000;margin-top:7px}
+    .damage-focus{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.22)}
+    .damage-focus .v{font-size:clamp(17px,3vw,23px);font-weight:950;color:#ffd6d6;line-height:1.35;margin-top:7px}
+
+  
+    /* === GARANSI MERAH + TESTIMONI POPUP V2.5 === */
+    #warrantyBox,
+    #warrantyBox .small,
+    #warrantyBox .muted,
+    #warrantyBox .warranty-big,
+    #warrantyBox .warranty-state,
+    #warrantyBox .warranty-dates{
+      color:#ff4d57 !important;
+    }
+    #warrantyBox .warranty-state{
+      background:rgba(239,68,68,.14) !important;
+      border-color:rgba(239,68,68,.34) !important;
+      font-weight:1000;
+    }
+    #warrantyBox .warranty-dates{
+      font-weight:900;
+    }
+
+    .testimonial-popup{
+      position:fixed;inset:0;z-index:9999;
+      display:none;align-items:center;justify-content:center;
+      padding:18px;background:rgba(2,10,20,.78);
+      backdrop-filter:blur(7px);
+    }
+    .testimonial-popup.show{display:flex}
+    .testimonial-popup-box{
+      width:min(460px,100%);
+      border:1px solid rgba(39,182,255,.28);
+      background:linear-gradient(180deg,#102b49,#091b2f);
+      border-radius:22px;padding:22px;
+      box-shadow:0 24px 70px rgba(0,0,0,.48);
+    }
+    .testimonial-popup-head{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+      margin-bottom:8px;
+    }
+    .testimonial-popup-title{font-size:20px;font-weight:1000}
+    .testimonial-popup-sub{font-size:12px;color:var(--muted);line-height:1.55}
+    .testimonial-popup-close{
+      flex:none;width:34px;height:34px;border-radius:11px;
+      border:1px solid var(--line);background:rgba(255,255,255,.06);
+      color:white;font-size:18px;cursor:pointer;
+    }
+    .popup-rating{display:flex;gap:9px;margin:18px 0 12px}
+    .popup-star{
+      border:0;background:none;padding:0;cursor:pointer;
+      font-size:34px;color:#50677e;
+    }
+    .popup-star.active{color:#ffc857}
+    .popup-reason{
+      padding:13px;border-radius:14px;background:rgba(255,255,255,.04);
+      border:1px solid var(--line);font-size:12px;line-height:1.55;color:#dcecff;
+      min-height:52px;
+    }
+
   </style>
 </head>
 <body>
@@ -472,21 +537,7 @@
         </div>
       </div>
 
-      <div class="hero-side">
-        <div>
-          <div class="trust-title">KENAPA SERVICE DI RK CELL?</div>
-          <div class="trust-grid">
-            <div class="trust-item"><b>01</b><span>Pemeriksaan perangkat lebih terstruktur</span></div>
-            <div class="trust-item"><b>02</b><span>Progress dapat dipantau lewat invoice</span></div>
-            <div class="trust-item"><b>03</b><span>QC akhir sebelum perangkat diserahkan</span></div>
-            <div class="trust-item"><b>04</b><span>Garansi tercatat dan mudah dicek kembali</span></div>
-          </div>
-        </div>
-        <div class="cta">
-          <button class="btn btn-primary" onclick="document.getElementById('tracking').scrollIntoView()">Cek Service Saya</button>
-          <button class="btn btn-wa" onclick="openWA()">Konsultasi WhatsApp</button>
-        </div>
-      </div>
+
     </section>
 
     <section class="card lookup" id="tracking">
@@ -507,105 +558,105 @@
     <section id="serviceShell" class="service-shell">
       <div class="stack">
         <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>DETAIL SERVICE</h2>
-              <p>INFORMASI UTAMA PERANGKAT DAN PROGRES PERBAIKAN</p>
-            </div>
-            <div id="statusBadge" class="badge status-progress">MEMUAT</div>
-          </div>
-          <div id="summaryGrid" class="summary"></div>
-        </section>
+                  <div class="section-head">
+                    <div>
+                      <h2>DETAIL SERVICE</h2>
+                      <p>INFORMASI UTAMA PERANGKAT DAN PROGRES PERBAIKAN</p>
+                    </div>
+                    <div id="statusBadge" class="badge status-progress">MEMUAT</div>
+                  </div>
+                  <div id="summaryGrid" class="summary"></div>
+                </section>
+
+        <section class="card">
+                  <div class="section-head">
+                    <div>
+                      <h2>PROGRESS SERVICE</h2>
+                      <p>Perjalanan perangkat Anda di RK CELL</p>
+                    </div>
+                  </div>
+                  <div id="progressBar" class="progress"></div>
+                </section>
 
         <section class="card" id="paymentCard">
-          <div class="section-head">
-            <div>
-              <h2>PEMBAYARAN</h2>
-              <p>Informasi pembayaran yang tercatat oleh Admin RK CELL</p>
-            </div>
-          </div>
-          <div id="paymentBox" class="payment-box">
-            <div class="small muted">MEMUAT DATA PEMBAYARAN...</div>
-          </div>
-        </section>
+                  <div class="section-head">
+                    <div>
+                      <h2>PEMBAYARAN</h2>
+                      <p>Informasi pembayaran yang tercatat oleh Admin RK CELL</p>
+                    </div>
+                  </div>
+                  <div id="paymentBox" class="payment-box">
+                    <div class="small muted">MEMUAT DATA PEMBAYARAN...</div>
+                  </div>
+                </section>
 
         <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Tanggal Service</h2>
-              <p>Tanggal masuk, selesai, diambil, dan masa garansi</p>
-            </div>
-          </div>
-          <div id="dateGrid" class="date-grid"></div>
-        </section>
+                  <div class="section-head">
+                    <div>
+                      <h2>Komponen yang Diganti</h2>
+                      <p>Part / komponen yang tercatat pada service</p>
+                    </div>
+                  </div>
+                  <div id="partsBox" class="parts-box"></div>
+                </section>
 
         <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Komponen yang Diganti</h2>
-              <p>Part / komponen yang tercatat pada service</p>
-            </div>
-          </div>
-          <div id="partsBox" class="parts-box"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>PROGRESS SERVICE</h2>
-              <p>Perjalanan perangkat Anda di RK CELL</p>
-            </div>
-          </div>
-          <div id="progressBar" class="progress"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>QUALITY CONTROL</h2>
-              <p>Pemeriksaan sebelum dan sesudah pengerjaan</p>
-            </div>
-          </div>
-          <div class="qc-grid">
-            <div id="qcInitialCard" class="qc-card" onclick="toggleQc('qcInitialCard')"></div>
-            <div id="qcFinalCard" class="qc-card" onclick="toggleQc('qcFinalCard')"></div>
-          </div>
-        </section>
+                  <div class="section-head">
+                    <div>
+                      <h2>QUALITY CONTROL</h2>
+                      <p>Pemeriksaan sebelum dan sesudah pengerjaan</p>
+                    </div>
+                  </div>
+                  <div class="qc-grid">
+                    <div id="qcInitialCard" class="qc-card" onclick="toggleQc('qcInitialCard')"></div>
+                    <div id="qcFinalCard" class="qc-card" onclick="toggleQc('qcFinalCard')"></div>
+                  </div>
+                </section>
 
         <section class="card" id="servicePhotosCard">
-          <div class="section-head">
-            <div>
-              <h2>FOTO SERVICE</h2>
-              <p>Dokumentasi kondisi masuk dan pemeriksaan teknisi</p>
-            </div>
-          </div>
-          <div id="servicePhotoGroups" class="service-photo-groups">
-            <div class="empty">BELUM ADA FOTO SERVICE.</div>
-          </div>
-        </section>
+                  <div class="section-head">
+                    <div>
+                      <h2>FOTO SERVICE</h2>
+                      <p>Dokumentasi kondisi masuk dan pemeriksaan teknisi</p>
+                    </div>
+                  </div>
+                  <div id="servicePhotoGroups" class="service-photo-groups">
+                    <div class="empty">BELUM ADA FOTO SERVICE.</div>
+                  </div>
+                </section>
 
         <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Testimoni Pelanggan</h2>
-              <p>Bantu RK CELL terus meningkatkan pelayanan</p>
-            </div>
-          </div>
-          <div id="testimonialSaved" class="small muted" style="margin-bottom:10px"></div>
-          <div class="rating" id="ratingStars">
-            <button class="star" data-v="1">★</button>
-            <button class="star" data-v="2">★</button>
-            <button class="star" data-v="3">★</button>
-            <button class="star" data-v="4">★</button>
-            <button class="star" data-v="5">★</button>
-          </div>
-          <div id="testimonialReason" style="padding:16px;border-radius:16px;background:linear-gradient(145deg,rgba(39,182,255,.10),rgba(255,154,47,.07));border:1px solid rgba(39,182,255,.20)"><div id="testimonialTitle" style="font-size:14px;font-weight:950;color:#fff">PILIH BINTANG PENILAIAN</div><div id="testimonialDesc" style="margin-top:6px;font-size:11px;line-height:1.55;color:#9fb4c9">Sentuh bintang sesuai pengalaman pelayanan Anda di RK CELL.</div></div>
-          <textarea id="testimonialText" style="display:none"></textarea>
-          <div class="cta">
-            <button class="btn btn-primary" onclick="submitTestimonial()">Kirim Testimoni</button>
-          </div>
-          <div id="testimonialMsg" class="status-msg"></div>
-        </section>
+                  <div class="section-head">
+                    <div>
+                      <h2>Tanggal Service</h2>
+                      <p>Tanggal masuk, selesai, diambil, dan masa garansi</p>
+                    </div>
+                  </div>
+                  <div id="dateGrid" class="date-grid"></div>
+                </section>
+
+        <section class="card">
+                  <div class="section-head">
+                    <div>
+                      <h2>Testimoni Pelanggan</h2>
+                      <p>Bantu RK CELL terus meningkatkan pelayanan</p>
+                    </div>
+                  </div>
+                  <div id="testimonialSaved" class="small muted" style="margin-bottom:10px"></div>
+                  <div class="rating" id="ratingStars">
+                    <button class="star" data-v="1">★</button>
+                    <button class="star" data-v="2">★</button>
+                    <button class="star" data-v="3">★</button>
+                    <button class="star" data-v="4">★</button>
+                    <button class="star" data-v="5">★</button>
+                  </div>
+                  <div id="testimonialReason" style="padding:16px;border-radius:16px;background:linear-gradient(145deg,rgba(39,182,255,.10),rgba(255,154,47,.07));border:1px solid rgba(39,182,255,.20)"><div id="testimonialTitle" style="font-size:14px;font-weight:950;color:#fff">PILIH BINTANG PENILAIAN</div><div id="testimonialDesc" style="margin-top:6px;font-size:11px;line-height:1.55;color:#9fb4c9">Sentuh bintang sesuai pengalaman pelayanan Anda di RK CELL.</div></div>
+                  <textarea id="testimonialText" style="display:none"></textarea>
+                  <div class="cta">
+                    <button class="btn btn-primary" onclick="submitTestimonial()">Kirim Testimoni</button>
+                  </div>
+                  <div id="testimonialMsg" class="status-msg"></div>
+                </section>
       </div>
 
       <aside class="stack">
@@ -631,14 +682,7 @@
           </div>
         </section>
 
-        <section class="card">
-          <div class="section-head">
-            <div><h2>Promo Aktif</h2><p>Program yang sedang tersedia di RK CELL</p></div>
-          </div>
-          <div id="promoGrid" class="promo-grid">
-            <div class="empty">Memuat promo...</div>
-          </div>
-        </section>
+
 
         <section class="card">
           <div class="section-head">
@@ -665,6 +709,32 @@
   <div id="photoModal" class="photo-modal" onclick="closeQcPhoto()">
     <button class="photo-close" type="button" aria-label="Tutup">×</button>
     <img id="photoModalImg" alt="Foto pemeriksaan QC" onclick="event.stopPropagation()">
+  </div>
+
+
+  <div id="testimonialPopup" class="testimonial-popup" aria-hidden="true">
+    <div class="testimonial-popup-box">
+      <div class="testimonial-popup-head">
+        <div>
+          <div class="testimonial-popup-title">BAGAIMANA PELAYANAN RK CELL?</div>
+          <div class="testimonial-popup-sub">Berikan penilaian untuk service ini. Testimoni membantu kami meningkatkan pelayanan.</div>
+        </div>
+        <button class="testimonial-popup-close" onclick="closeTestimonialPopup()" aria-label="Tutup">×</button>
+      </div>
+      <div id="popupRatingStars" class="popup-rating">
+        <button class="popup-star" data-v="1">★</button>
+        <button class="popup-star" data-v="2">★</button>
+        <button class="popup-star" data-v="3">★</button>
+        <button class="popup-star" data-v="4">★</button>
+        <button class="popup-star" data-v="5">★</button>
+      </div>
+      <div id="popupReason" class="popup-reason">Pilih 1–5 bintang sesuai pengalaman pelayanan Anda.</div>
+      <div class="cta" style="margin-top:14px">
+        <button class="btn btn-primary" style="flex:1" onclick="submitPopupTestimonial()">KIRIM TESTIMONI</button>
+        <button class="btn btn-secondary" onclick="closeTestimonialPopup()">NANTI</button>
+      </div>
+      <div id="popupTestimonialMsg" class="status-msg"></div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -908,11 +978,10 @@
       const customer = o.customer_name || '—';
       const device = o.device_name || o.device_type || '—';
       $('summaryGrid').innerHTML = `
-        <div class="info"><div class="k">NO. INVOICE</div><div class="v">${esc(upperText(o.ticket))}</div></div>
-        <div class="info"><div class="k">PELANGGAN</div><div class="v">${esc(upperText(customer))}</div></div>
+        <div class="info full tracking-focus customer-focus"><div class="k">NAMA PELANGGAN</div><div class="v">${esc(upperText(customer))}</div></div>
+        <div class="info full tracking-focus damage-focus"><div class="k">KERUSAKAN / KELUHAN</div><div class="v">${esc(upperText(o.complaint || '—'))}</div></div>
         <div class="info"><div class="k">PERANGKAT</div><div class="v">${esc(upperText(device))}</div></div>
-        <div class="info"><div class="k">IMEI / SERIAL</div><div class="v">${esc(upperText(maskImei(o.imei || o.imei1 || o.serial_number)))}</div></div>
-        <div class="info full"><div class="k">KELUHAN / KERUSAKAN</div><div class="v">${esc(upperText(o.complaint || '—'))}</div></div>
+        <div class="info"><div class="k">NO. INVOICE</div><div class="v">${esc(upperText(o.ticket))}</div></div>
         <div class="info full"><div class="k">TINDAKAN / HASIL SERVICE</div><div class="v">${esc(upperText(o.final_result || 'BELUM ADA RINGKASAN TINDAKAN.'))}</div></div>
       `;
     }
@@ -1060,6 +1129,8 @@
       }
 
       $('serviceShell').classList.add('active');
+      if(testimonialPopupTimer) clearTimeout(testimonialPopupTimer);
+      testimonialPopupTimer = setTimeout(openTestimonialPopup,5000);
       $('statusMsg').textContent = `Tracking ditemukan • terakhir diperbarui ${fmtDate(data.updated_at || data.created_at)}`;
       history.replaceState(null,'',`?t=${encodeURIComponent(ticket)}`);
       setTimeout(()=>$('serviceShell').scrollIntoView({behavior:'smooth',block:'start'}),100);
@@ -1131,6 +1202,62 @@
       $('testimonialSaved').textContent='✓ PENILAIAN ANDA SUDAH TERSIMPAN';
     }
 
+
+    let testimonialPopupTimer = null;
+
+    function refreshPopupStars(){
+      document.querySelectorAll('.popup-star').forEach(s=>{
+        s.classList.toggle('active',Number(s.dataset.v)<=selectedRating);
+      });
+      const item = testimonialReasons[selectedRating];
+      const reason = $('popupReason');
+      if(reason){
+        reason.textContent = item
+          ? `${item.title} — ${item.desc}`
+          : 'Pilih 1–5 bintang sesuai pengalaman pelayanan Anda.';
+      }
+    }
+
+    function openTestimonialPopup(){
+      if(!currentTicket || !currentOrder) return;
+      if(currentOrder.customer_rating || currentOrder.customer_testimonial) return;
+      const pop=$('testimonialPopup');
+      if(!pop) return;
+      refreshPopupStars();
+      pop.classList.add('show');
+      pop.setAttribute('aria-hidden','false');
+    }
+
+    function closeTestimonialPopup(){
+      const pop=$('testimonialPopup');
+      if(!pop) return;
+      pop.classList.remove('show');
+      pop.setAttribute('aria-hidden','true');
+    }
+
+    async function submitPopupTestimonial(){
+      if(selectedRating<1 || selectedRating>5){
+        $('popupTestimonialMsg').textContent='Pilih rating 1–5 bintang.';
+        return;
+      }
+      applyTestimonialReason();
+      $('popupTestimonialMsg').textContent='Mengirim testimoni...';
+      await submitTestimonial();
+      $('popupTestimonialMsg').textContent=$('testimonialMsg').textContent;
+      if(String($('testimonialMsg').textContent).toLowerCase().includes('tersimpan')){
+        closeTestimonialPopup();
+      }
+    }
+
+    document.querySelectorAll('.popup-star').forEach(s=>{
+      s.addEventListener('click',()=>{
+        selectedRating=Number(s.dataset.v);
+        refreshStars();
+        applyTestimonialReason();
+        refreshPopupStars();
+      });
+    });
+
     async function loadPromos(){
       const grid = $('promoGrid');
       let rows = [];
@@ -1181,7 +1308,6 @@
     }
 
     document.addEventListener('DOMContentLoaded',()=>{
-      loadPromos();
       const p = new URLSearchParams(location.search);
       const t = (p.get('t') || '').trim();
       if(t){
