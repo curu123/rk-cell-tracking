@@ -410,6 +410,21 @@
     }
     @media(max-width:560px){.payment-grid{grid-template-columns:1fr}}
 
+    /* === QC DETAIL + FOTO PATCH === */
+    .qc-photo-section{margin-top:14px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.10)}
+    .qc-photo-title{font-size:10px;font-weight:900;letter-spacing:.65px;color:#cfe6f7;margin-bottom:9px}
+    .qc-photo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .qc-photo{display:block;aspect-ratio:1/1;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#07182a;cursor:pointer}
+    .qc-photo img{width:100%;height:100%;object-fit:cover;display:block}
+    .qc-group{margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07)}
+    .qc-group:first-child{margin-top:0;padding-top:0;border-top:0}
+    .qc-group-title{font-size:10px;font-weight:950;color:#8fdcff;letter-spacing:.55px;margin-bottom:7px}
+    .photo-modal{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:18px}
+    .photo-modal.open{display:flex}
+    .photo-modal img{max-width:96vw;max-height:90vh;border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,.55)}
+    .photo-close{position:absolute;right:18px;top:18px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:24px;cursor:pointer}
+    @media(max-width:560px){.qc-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
   </style>
 </head>
 <body>
@@ -623,6 +638,12 @@
     </footer>
   </main>
 
+
+  <div id="photoModal" class="photo-modal" onclick="closeQcPhoto()">
+    <button class="photo-close" type="button" aria-label="Tutup">×</button>
+    <img id="photoModalImg" alt="Foto pemeriksaan QC" onclick="event.stopPropagation()">
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://qvgswujpyrvlhdxjcgiq.supabase.co';
@@ -690,40 +711,87 @@
       return 0;
     }
 
-    function renderProgress(status){
-      const labels = ['Masuk','Diagnosa','Konfirmasi','Proses','QC','Selesai'];
-      const idx = progressIndex(status);
-      $('progressBar').innerHTML = labels.map((x,i)=>{
-        const cls = i < idx ? 'step done' : (i===idx ? 'step active' : 'step');
-        return `<div class="${cls}"><div class="dot">${i < idx ? '✓' : i+1}</div><small>${x}</small></div>`;
+    function renderProgress(status,o=null){
+      const labels=['Masuk','QC Awal','Diagnosa','Proses','QC Akhir','Selesai','Diambil'];
+      const s=normStatus(status);
+      const picked=['picked_up','diambil','picked','sudah diambil','sudah_diambil'].includes(s) || !!(o&&o.picked_up_at);
+      const completed=picked || ['completed','selesai'].includes(s) || !!(o&&o.finished_at);
+      const hasFinal=!!(o&&(flattenQc(o.qc_final||o.final_checklist).length));
+      const hasInitial=!!(o&&(flattenQc(o.qc_initial||o.initial_checklist).length));
+      const hasDiag=!!(o&&(o.diagnosis||o.diagnosa||o.diagnosis_result||o.final_result));
+      let idx=0;
+      if(hasInitial) idx=Math.max(idx,1);
+      if(hasDiag) idx=Math.max(idx,2);
+      if(['in_progress','proses','pending','quality','quality_control','qc'].includes(s)||hasFinal||completed) idx=Math.max(idx,3);
+      if(hasFinal||completed) idx=Math.max(idx,4);
+      if(completed) idx=Math.max(idx,5);
+      if(picked) idx=6;
+      $('progressBar').style.gridTemplateColumns=`repeat(${labels.length},1fr)`;
+      $('progressBar').innerHTML=labels.map((x,i)=>{
+        const cls=i<idx?'step done':(i===idx?'step active':'step');
+        return `<div class="${cls}"><div class="dot">${i<idx?'✓':i+1}</div><small>${x}</small></div>`;
       }).join('');
     }
 
     function flattenQc(data){
       if(!data) return [];
-      let src = data;
-      if(typeof src === 'string'){
-        try{ src = JSON.parse(src); }catch{ return []; }
-      }
-      if(Array.isArray(src)){
-        return src.map((x,i)=>{
-          if(typeof x === 'string') return {name:x,status:'NORMAL'};
-          return {
-            name:x.name || x.label || x.item || x.title || `Item ${i+1}`,
-            status:x.status || x.result || x.value || x.state || ''
-          };
-        });
-      }
-      if(src.items && Array.isArray(src.items)) return flattenQc(src.items);
-      if(src.qc && typeof src.qc === 'object') return flattenQc(src.qc);
-      if(typeof src === 'object'){
-        return Object.entries(src).map(([k,v])=>{
-          if(v && typeof v==='object') return {name:v.name||v.label||k,status:v.status||v.result||v.value||''};
-          return {name:k,status:String(v ?? '')};
-        });
-      }
-      return [];
+      let src=data;
+      if(typeof src==='string'){ try{src=JSON.parse(src)}catch{return []} }
+      const out=[];
+      const walk=(node,path=[])=>{
+        if(node===null || node===undefined) return;
+        if(Array.isArray(node)){
+          node.forEach((x,i)=>{
+            if(typeof x==='string') out.push({group:path.join(' / '),name:x,status:'NORMAL'});
+            else if(x && typeof x==='object' && (x.name||x.label||x.item||x.title)){
+              out.push({group:path.join(' / '),name:x.name||x.label||x.item||x.title||`Item ${i+1}`,status:x.status||x.result||x.value||x.state||''});
+            }else walk(x,path);
+          });
+          return;
+        }
+        if(typeof node==='object'){
+          if(node.items && Array.isArray(node.items)){ walk(node.items,path); return; }
+          Object.entries(node).forEach(([k,v])=>{
+            const key=String(k);
+            if(/photo|foto|image|gambar|url/i.test(key)) return;
+            if(v && typeof v==='object' && !Array.isArray(v) && (v.status!==undefined||v.result!==undefined||v.value!==undefined||v.state!==undefined)){
+              out.push({group:path.join(' / '),name:v.name||v.label||key,status:v.status||v.result||v.value||v.state||''});
+            }else if(v && typeof v==='object'){
+              walk(v,[...path,key.replace(/_/g,' ').toUpperCase()]);
+            }else if(typeof v==='string'||typeof v==='number'||typeof v==='boolean'){
+              out.push({group:path.join(' / '),name:key.replace(/_/g,' '),status:String(v)});
+            }
+          });
+        }
+      };
+      walk(src,[]);
+      return out;
     }
+
+    function collectPhotoUrls(...sources){
+      const urls=[];
+      const seen=new Set();
+      const add=v=>{
+        if(typeof v!=='string') return;
+        const t=v.trim();
+        if(!/^https?:\/\//i.test(t) || seen.has(t)) return;
+        seen.add(t); urls.push(t);
+      };
+      const walk=(node,key='')=>{
+        if(!node) return;
+        if(typeof node==='string'){
+          if(/photo|foto|image|gambar|url|front|back|damage|after/i.test(key)) add(node);
+          return;
+        }
+        if(Array.isArray(node)){node.forEach(x=>walk(x,key));return;}
+        if(typeof node==='object') Object.entries(node).forEach(([k,v])=>walk(v,k));
+      };
+      sources.forEach(x=>walk(x));
+      return urls.slice(0,12);
+    }
+
+    function openQcPhoto(url){ $('photoModalImg').src=url; $('photoModal').classList.add('open'); }
+    function closeQcPhoto(){ $('photoModal').classList.remove('open'); $('photoModalImg').src=''; }
 
     function qcClass(status){
       const s = String(status||'').toUpperCase();
@@ -738,41 +806,21 @@
         .some(x=>s.includes(x));
     }
 
-    function renderQcCard(target,title,data){
-      const rows = flattenQc(data);
-      const problems = rows.filter(x=>qcHasProblem(x.status));
-
-      let badgeClass = 'empty';
-      let badgeText = 'BELUM ADA DATA';
-      let hint = 'KLIK UNTUK MELIHAT DETAIL';
-
+    function renderQcCard(target,title,data,photos=[]){
+      const rows=flattenQc(data);
+      const problems=rows.filter(x=>qcHasProblem(x.status));
+      let badgeClass='empty', badgeText='BELUM ADA DATA', hint='KLIK UNTUK MELIHAT DETAIL';
       if(rows.length){
-        if(problems.length){
-          badgeClass = 'problem';
-          badgeText = `ADA ${problems.length} MASALAH`;
-          hint = 'PERLU PERHATIAN • KLIK UNTUK DETAIL';
-        }else{
-          badgeClass = 'ok';
-          badgeText = 'TIDAK ADA MASALAH';
-          hint = 'HASIL QC NORMAL • KLIK UNTUK DETAIL';
-        }
+        if(problems.length){badgeClass='problem';badgeText=`ADA ${problems.length} MASALAH`;hint=`${rows.length} PEMERIKSAAN • KLIK UNTUK DETAIL`;}
+        else{badgeClass='ok';badgeText='TIDAK ADA MASALAH';hint=`${rows.length} PEMERIKSAAN • KLIK UNTUK DETAIL`;}
       }
-
-      const details = rows.length
-        ? rows.slice(0,60).map(x=>`
-            <div class="qc-row">
-              <span>${esc(upperText(x.name))}</span>
-              <span class="${qcClass(x.status)}">${esc(upperText(x.status || '—'))}</span>
-            </div>`).join('')
-        : '<div class="small muted">BELUM ADA DATA QC.</div>';
-
-      $(target).innerHTML = `
-        <div class="qc-summary-head">
-          <h4 style="margin:0">${title}</h4>
-          <span class="qc-state ${badgeClass}">${badgeText}</span>
-        </div>
-        <div class="qc-hint">${hint}</div>
-        <div class="qc-details">${details}</div>`;
+      const groups={};
+      rows.slice(0,100).forEach(x=>{const g=x.group||'PEMERIKSAAN';(groups[g]??=[]).push(x)});
+      const details=rows.length?Object.entries(groups).map(([g,items])=>`
+        <div class="qc-group"><div class="qc-group-title">${esc(upperText(g))}</div>${items.map(x=>`
+          <div class="qc-row"><span>${esc(upperText(x.name))}</span><span class="${qcClass(x.status)}">${esc(upperText(x.status||'—'))}</span></div>`).join('')}</div>`).join(''):'<div class="small muted">BELUM ADA DATA QC.</div>';
+      const photoHtml=photos.length?`<div class="qc-photo-section"><div class="qc-photo-title">FOTO PEMERIKSAAN • ${photos.length} FOTO</div><div class="qc-photo-grid">${photos.map((u,i)=>`<button class="qc-photo" type="button" onclick="event.stopPropagation();openQcPhoto('${esc(u)}')"><img src="${esc(u)}" loading="lazy" alt="${title} foto ${i+1}" onerror="this.closest('.qc-photo').style.display='none'"></button>`).join('')}</div></div>`:'';
+      $(target).innerHTML=`<div class="qc-summary-head"><h4 style="margin:0">${title}</h4><span class="qc-state ${badgeClass}">${badgeText}</span></div><div class="qc-hint">${hint}</div><div class="qc-details">${details}${photoHtml}</div>`;
     }
 
     function renderWarranty(o){
@@ -923,9 +971,11 @@
       renderPayment(data);
       renderDates(data);
       renderParts(data);
-      renderProgress(data.status);
-      renderQcCard('qcInitialCard','QC AWAL',data.qc_initial || data.initial_checklist);
-      renderQcCard('qcFinalCard','QC AKHIR',data.qc_final || data.final_checklist);
+      renderProgress(data.status,data);
+      const qcInitialPhotos=collectPhotoUrls(data.qc_initial_photos,data.initial_photos,data.photos_before,data.photo_front,data.photo_back,data.photo_damage,data.qc_initial,data.initial_checklist);
+      const qcFinalPhotos=collectPhotoUrls(data.qc_final_photos,data.final_photos,data.photos_after,data.photo_after_repair,data.after_repair,data.qc_final,data.final_checklist);
+      renderQcCard('qcInitialCard','QC AWAL',data.qc_initial || data.initial_checklist,qcInitialPhotos);
+      renderQcCard('qcFinalCard','QC AKHIR',data.qc_final || data.final_checklist,qcFinalPhotos);
       renderWarranty(data);
 
       if(data.customer_rating){
